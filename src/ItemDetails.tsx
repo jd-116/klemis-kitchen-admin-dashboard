@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
-import { Container, Button, Table, Form, Modal } from 'react-bootstrap'
+import React, { useState } from 'react';
+import { Container, Button, Table, Form, Modal } from 'react-bootstrap';
 
 type PantryItem = {
-  name: string
-  id: string
-  nutrition: string | null
-  thumbnail: string | null
-}
+  name: string;
+  id: string;
+  nutrition: string | null;
+  thumbnail: string | null;
+};
 
 const renderItemDetailRow = (
   data: PantryItem,
@@ -20,64 +20,111 @@ const renderItemDetailRow = (
       <td>{data.nutrition}</td>
       <td>{data.thumbnail}</td>
       <td>
-        <Button onClick={() => {
-          setCurrentEditingItem(data)
-          setModalVisible(true)
-        }}
-          variant='primary'>
+        <Button
+          onClick={() => {
+            setCurrentEditingItem(data);
+            setModalVisible(true);
+          }}
+          variant="primary"
+        >
           Edit
         </Button>
       </td>
     </tr>
-  )
-}
+  );
+};
 
 type EditItemProps = {
-  item: PantryItem | undefined,
-  onConfirm: () => void,
-  onCancel: () => void
-}
+  item: PantryItem | undefined;
+  onConfirm: () => void;
+  onCancel: () => void;
+  show: boolean;
+};
 
-const EditItem: React.FC<EditItemProps> = ({ item, onConfirm, onCancel }) => {
+const EditItem: React.FC<EditItemProps> = ({
+  item,
+  onConfirm,
+  onCancel,
+  show,
+}) => {
   return (
-    <Modal.Dialog>
-      <Modal.Header onClick={() => { onCancel() }} closeButton>
+    <Modal show={show} onHide={onCancel} centered>
+      <Modal.Header
+        onClick={() => {
+          onCancel();
+        }}
+        closeButton
+      >
         <Modal.Title>Edit {item ? item.name : 'unknown'}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
         <Form>
-          <Form.Group controlId='NutritionalFactsURL'>
+          <Form.Group controlId="NutritionalFactsURL">
             <Form.Label>Edit Nutritional Information Label</Form.Label>
-            <Form.Control as='input' placeholder={item ? (item.nutrition ? item.nutrition : 'unknown') : 'unknown'} />
+            <Form.Control
+              as="input"
+              placeholder={item?.nutrition ?? 'unknown'}
+            />
           </Form.Group>
 
-          <Form.Group controlId='ThumbnailURL'>
+          <Form.Group controlId="ThumbnailURL">
             <Form.Label>Edit Item Thumbnail</Form.Label>
-            <Form.Control as='input' placeholder={item ? (item.thumbnail ? item.thumbnail : 'unknown') : 'unknown'} />
+            <Form.Control
+              as="input"
+              placeholder={item?.thumbnail ?? 'unknown'}
+            />
           </Form.Group>
         </Form>
       </Modal.Body>
 
       <Modal.Footer>
-        <Button onClick={() => { onCancel() }} variant='secondary'>Cancel</Button>
-        <Button onClick={() => { onConfirm() }} variant='primary'>Confirm</Button>
+        <Button
+          onClick={() => {
+            onCancel();
+          }}
+          variant="secondary"
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            onConfirm();
+          }}
+          variant="primary"
+        >
+          Confirm
+        </Button>
       </Modal.Footer>
-    </Modal.Dialog>
-  )
-}
+    </Modal>
+  );
+};
 
-export default function Members() {
+export default function ItemDetails(): React.ReactElement {
   const data: PantryItem[] = [
-    { id: '1', name: 'poptart', nutrition: 'dummy url', thumbnail: 'dummy url' },
-    { id: '2', name: 'banana', nutrition: 'dummy url', thumbnail: 'dummy url' }
-  ]
-  const [currentEditingItem, setCurrentEditingItem] = useState<PantryItem>()
-  const [modalVisible, setModalVisible] = useState(false)
+    {
+      id: '1',
+      name: 'poptart',
+      nutrition: 'dummy url',
+      thumbnail: 'dummy url',
+    },
+    { id: '2', name: 'banana', nutrition: 'dummy url', thumbnail: 'dummy url' },
+  ];
+  const [currentEditingItem, setCurrentEditingItem] = useState<PantryItem>();
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <Container>
-      {modalVisible && <EditItem item={currentEditingItem} onConfirm={() => { setModalVisible(false) }} onCancel={() => { setModalVisible(false) }} />}
+      <EditItem
+        item={currentEditingItem}
+        onConfirm={() => {
+          setModalVisible(false);
+        }}
+        onCancel={() => {
+          setModalVisible(false);
+        }}
+        show={modalVisible}
+      />
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -89,9 +136,11 @@ export default function Members() {
           </tr>
         </thead>
         <tbody>
-          {data.map(item => renderItemDetailRow(item, setModalVisible, setCurrentEditingItem))}
+          {data.map((item) =>
+            renderItemDetailRow(item, setModalVisible, setCurrentEditingItem)
+          )}
         </tbody>
       </Table>
     </Container>
-  )
+  );
 }
