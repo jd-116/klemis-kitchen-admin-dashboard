@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Container, Button, Table, Form, Modal } from 'react-bootstrap';
+import React, { useState } from 'react'
+import { Container, Button, Table, Form, Modal } from 'react-bootstrap'
 
 type PantryItem = {
-  name: string;
-  id: string;
-  nutrition: string | null;
-  thumbnail: string | null;
-};
+  name: string
+  id: string
+  nutrition: string | null
+  thumbnail: string | null
+}
 
 const renderItemDetailRow = (
   data: PantryItem,
@@ -22,24 +22,24 @@ const renderItemDetailRow = (
       <td>
         <Button
           onClick={() => {
-            setCurrentEditingItem(data);
-            setModalVisible(true);
+            setCurrentEditingItem(data)
+            setModalVisible(true)
           }}
-          variant="primary"
+          variant='primary'
         >
           Edit
         </Button>
       </td>
     </tr>
-  );
-};
+  )
+}
 
 type EditItemProps = {
-  item: PantryItem | undefined;
-  onConfirm: () => void;
-  onCancel: () => void;
-  show: boolean;
-};
+  item: PantryItem | undefined
+  onConfirm: () => void
+  onCancel: () => void
+  show: boolean
+}
 
 const EditItem: React.FC<EditItemProps> = ({
   item,
@@ -51,7 +51,7 @@ const EditItem: React.FC<EditItemProps> = ({
     <Modal show={show} onHide={onCancel} centered>
       <Modal.Header
         onClick={() => {
-          onCancel();
+          onCancel()
         }}
         closeButton
       >
@@ -60,18 +60,18 @@ const EditItem: React.FC<EditItemProps> = ({
 
       <Modal.Body>
         <Form>
-          <Form.Group controlId="NutritionalFactsURL">
+          <Form.Group controlId='NutritionalFactsURL'>
             <Form.Label>Edit Nutritional Information Label</Form.Label>
             <Form.Control
-              as="input"
+              as='input'
               placeholder={item?.nutrition ?? 'unknown'}
             />
           </Form.Group>
 
-          <Form.Group controlId="ThumbnailURL">
+          <Form.Group controlId='ThumbnailURL'>
             <Form.Label>Edit Item Thumbnail</Form.Label>
             <Form.Control
-              as="input"
+              as='input'
               placeholder={item?.thumbnail ?? 'unknown'}
             />
           </Form.Group>
@@ -81,24 +81,24 @@ const EditItem: React.FC<EditItemProps> = ({
       <Modal.Footer>
         <Button
           onClick={() => {
-            onCancel();
+            onCancel()
           }}
-          variant="secondary"
+          variant='secondary'
         >
           Cancel
         </Button>
         <Button
           onClick={() => {
-            onConfirm();
+            onConfirm()
           }}
-          variant="primary"
+          variant='primary'
         >
           Confirm
         </Button>
       </Modal.Footer>
     </Modal>
-  );
-};
+  )
+}
 
 export default function ItemDetails(): React.ReactElement {
   const data: PantryItem[] = [
@@ -109,19 +109,19 @@ export default function ItemDetails(): React.ReactElement {
       thumbnail: 'dummy url',
     },
     { id: '2', name: 'banana', nutrition: 'dummy url', thumbnail: 'dummy url' },
-  ];
-  const [currentEditingItem, setCurrentEditingItem] = useState<PantryItem>();
-  const [modalVisible, setModalVisible] = useState(false);
+  ]
+  const [currentEditingItem, setCurrentEditingItem] = useState<PantryItem>()
+  const [modalVisible, setModalVisible] = useState(false)
 
   return (
     <Container>
       <EditItem
         item={currentEditingItem}
         onConfirm={() => {
-          setModalVisible(false);
+          setModalVisible(false)
         }}
         onCancel={() => {
-          setModalVisible(false);
+          setModalVisible(false)
         }}
         show={modalVisible}
       />
@@ -142,5 +142,5 @@ export default function ItemDetails(): React.ReactElement {
         </tbody>
       </Table>
     </Container>
-  );
+  )
 }

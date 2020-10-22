@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { Container, Row, Button, Table, Form, Modal } from 'react-bootstrap';
+import React, { useState } from 'react'
+import { Container, Row, Button, Table, Form, Modal } from 'react-bootstrap'
 
 type AddMemberProp = {
-  onConfirm: () => void;
-  onCancel: () => void;
-  show: boolean;
-};
+  onConfirm: () => void
+  onCancel: () => void
+  show: boolean
+}
 
 const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel, show }) => {
   return (
     <Modal show={show} onHide={onCancel} centered>
       <Modal.Header
         onClick={() => {
-          onCancel();
+          onCancel()
         }}
         closeButton
       >
@@ -21,9 +21,9 @@ const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel, show }) => {
 
       <Modal.Body>
         <Form>
-          <Form.Group controlId="GTUsername">
+          <Form.Group controlId='GTUsername'>
             <Form.Label>GT Username</Form.Label>
-            <Form.Control as="input" placeholder="gburdell3" />
+            <Form.Control as='input' placeholder='gburdell3' />
           </Form.Group>
         </Form>
       </Modal.Body>
@@ -31,44 +31,44 @@ const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel, show }) => {
       <Modal.Footer>
         <Button
           onClick={() => {
-            onCancel();
+            onCancel()
           }}
-          variant="secondary"
+          variant='secondary'
         >
           Cancel
         </Button>
         <Button
           onClick={() => {
-            onConfirm();
+            onConfirm()
           }}
-          variant="primary"
+          variant='primary'
         >
           Confirm
         </Button>
       </Modal.Footer>
     </Modal>
-  );
-};
+  )
+}
 
 export default function Members(): React.ReactElement {
-  const [addMemberModalVisible, setAddMemberModalVisible] = useState(false);
+  const [addMemberModalVisible, setAddMemberModalVisible] = useState(false)
 
   return (
     <Container>
-      <Row className="d-flex justify-content-around">
+      <Row className='d-flex justify-content-around'>
         <h3>Klemis Kitchen Student Members</h3>
         <Button onClick={() => setAddMemberModalVisible(true)}>+ Add</Button>
       </Row>
       <AddMember
         onConfirm={() => {
-          setAddMemberModalVisible(false);
+          setAddMemberModalVisible(false)
         }}
         onCancel={() => {
-          setAddMemberModalVisible(false);
+          setAddMemberModalVisible(false)
         }}
         show={addMemberModalVisible}
       />
-      <Table striped bordered hover size="sm">
+      <Table striped bordered hover size='sm'>
         <thead>
           <tr>
             <th>Last Name</th>
@@ -80,5 +80,5 @@ export default function Members(): React.ReactElement {
         <tbody></tbody>
       </Table>
     </Container>
-  );
+  )
 }

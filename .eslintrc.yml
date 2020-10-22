@@ -65,7 +65,11 @@ rules:
 
   # Prettier config (uses all defaults)
   # See https://prettier.io/docs/en/options.html
-  prettier/prettier: error
+  prettier/prettier: 
+    - error
+    - singleQuote: true
+      semi: false
+      jsxSingleQuote: true
 
 overrides:
   # Disable warning `require` on Node-js files
