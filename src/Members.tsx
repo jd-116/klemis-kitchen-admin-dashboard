@@ -1,16 +1,21 @@
 import React, { useState } from 'react'
 import { Container, Row, Button, Table, Form, Modal } from 'react-bootstrap'
 
-
 type AddMemberProp = {
-  onConfirm: () => void,
+  onConfirm: () => void
   onCancel: () => void
+  show: boolean
 }
 
-const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel }) => {
+const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel, show }) => {
   return (
-    <Modal.Dialog>
-      <Modal.Header onClick={() => { onCancel() }} closeButton>
+    <Modal show={show} onHide={onCancel} centered>
+      <Modal.Header
+        onClick={() => {
+          onCancel()
+        }}
+        closeButton
+      >
         <Modal.Title>Add Member</Modal.Title>
       </Modal.Header>
 
@@ -24,14 +29,28 @@ const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel }) => {
       </Modal.Body>
 
       <Modal.Footer>
-        <Button onClick={() => { onCancel() }} variant='secondary'>Cancel</Button>
-        <Button onClick={() => { onConfirm() }} variant='primary'>Confirm</Button>
+        <Button
+          onClick={() => {
+            onCancel()
+          }}
+          variant='secondary'
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            onConfirm()
+          }}
+          variant='primary'
+        >
+          Confirm
+        </Button>
       </Modal.Footer>
-    </Modal.Dialog>
+    </Modal>
   )
 }
 
-export default function Members() {
+export default function Members(): React.ReactElement {
   const [addMemberModalVisible, setAddMemberModalVisible] = useState(false)
 
   return (
@@ -40,7 +59,15 @@ export default function Members() {
         <h3>Klemis Kitchen Student Members</h3>
         <Button onClick={() => setAddMemberModalVisible(true)}>+ Add</Button>
       </Row>
-      {addMemberModalVisible && <AddMember onConfirm={() => { setAddMemberModalVisible(false) }} onCancel={() => { setAddMemberModalVisible(false) }} />}
+      <AddMember
+        onConfirm={() => {
+          setAddMemberModalVisible(false)
+        }}
+        onCancel={() => {
+          setAddMemberModalVisible(false)
+        }}
+        show={addMemberModalVisible}
+      />
       <Table striped bordered hover size='sm'>
         <thead>
           <tr>
@@ -50,8 +77,7 @@ export default function Members() {
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-        </tbody>
+        <tbody></tbody>
       </Table>
     </Container>
   )

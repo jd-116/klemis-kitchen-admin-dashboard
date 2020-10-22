@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { Navbar, Tabs, Tab, Container, Row, Col, Button } from 'react-bootstrap'
 
 import Home from './Home'
-import Members from './Members'
 import ItemDetails from './ItemDetails'
+import Members from './Members'
 
 import 'bootstrap/dist/css/bootstrap.css'
 
-function App() {
+function App(): React.ReactElement {
   const [key, setKey] = useState('home')
 
   return (
@@ -21,14 +21,15 @@ function App() {
           </Col>
           <Col>
             <Container className='float-right'>
-              <Button variant='danger'>
-                Log Out
-              </Button>
+              <Button variant='danger'>Log Out</Button>
             </Container>
           </Col>
         </Row>
 
-        <Tabs activeKey={key} onSelect={(k: any) => setKey(k)}>
+        <Tabs
+          activeKey={key}
+          onSelect={(k: string | null) => setKey(k ?? 'home')}
+        >
           <Tab eventKey='home' title='Home'>
             <Home />
           </Tab>
