@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Container, Button, Table, Form, Modal } from 'react-bootstrap'
 
 type PantryItem = {
@@ -47,8 +47,37 @@ const EditItem: React.FC<EditItemProps> = ({
   onCancel,
   show,
 }) => {
+  const [nutritionalFactValue, setNutritionalFactValue] = useState('unknown')
+  const [thumbnailValue, setThumbnailValue] = useState('unknown')
+  const requestURL = `placeholder/product-metadata/${item?.id}`
+  const [requestBody, setRequestBody] = useState('{}')
+
+  useEffect(() => {
+    const thumbnailChanged = thumbnailValue !== item?.nutrition ?? 'unknown'
+    const nutritionalFactChanged =
+      nutritionalFactValue !== item?.nutrition ?? 'unknown'
+
+    if (thumbnailChanged && nutritionalFactValue) {
+      setRequestBody(
+        `{"nutrition": "${nutritionalFactValue}", "thumbnail": "${thumbnailValue}"}`
+      )
+    } else if (nutritionalFactChanged) {
+      setRequestBody(`{"nutrition": "${nutritionalFactValue}"}`)
+    } else if (thumbnailChanged) {
+      setRequestBody(`{"thumbnail": "${thumbnailValue}"}`)
+    }
+  }, [nutritionalFactValue, thumbnailValue])
+
   return (
-    <Modal show={show} onHide={onCancel} centered>
+    <Modal
+      show={show}
+      onHide={onCancel}
+      centered
+      onEntering={() => {
+        setNutritionalFactValue(item?.nutrition ?? 'unknown')
+        setThumbnailValue(item?.thumbnail ?? 'unknown')
+      }}
+    >
       <Modal.Header
         onClick={() => {
           onCancel()
@@ -64,7 +93,8 @@ const EditItem: React.FC<EditItemProps> = ({
             <Form.Label>Edit Nutritional Information Label</Form.Label>
             <Form.Control
               as='input'
-              placeholder={item?.nutrition ?? 'unknown'}
+              placeholder={nutritionalFactValue}
+              onChange={(e) => setNutritionalFactValue(e.target.value)}
             />
           </Form.Group>
 
@@ -72,7 +102,8 @@ const EditItem: React.FC<EditItemProps> = ({
             <Form.Label>Edit Item Thumbnail</Form.Label>
             <Form.Control
               as='input'
-              placeholder={item?.thumbnail ?? 'unknown'}
+              placeholder={thumbnailValue}
+              onChange={(e) => setThumbnailValue(e.target.value)}
             />
           </Form.Group>
         </Form>
@@ -89,6 +120,11 @@ const EditItem: React.FC<EditItemProps> = ({
         </Button>
         <Button
           onClick={() => {
+            const request = new Request(requestURL, {
+              method: 'PATCH',
+              body: requestBody,
+            })
+            console.log(requestBody)
             onConfirm()
           }}
           variant='primary'
