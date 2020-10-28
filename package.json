@@ -4,13 +4,8 @@
   "private": true,
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "yarn format"
     }
-  },
-  "lint-staged": {
-    "./src/*.{js,jsx,ts,tsx}": [
-      "eslint --fix -f unix \"src/**/*.{js,jsx,ts,tsx,json}\""
-    ]
   },
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -55,7 +50,7 @@
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.11.0",
+    "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-react-app": "^5.2.1",
