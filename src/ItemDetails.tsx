@@ -67,7 +67,7 @@ const EditItem: React.FC<EditItemProps> = ({ item, onConfirm, onCancel }) => {
   )
 }
 
-export default function Members() {
+export default function ItemDetails() {
   const data: PantryItem[] = [
     { id: '1', name: 'poptart', nutrition: 'dummy url', thumbnail: 'dummy url' },
     { id: '2', name: 'banana', nutrition: 'dummy url', thumbnail: 'dummy url' }
