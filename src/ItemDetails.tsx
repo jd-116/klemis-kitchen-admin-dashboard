@@ -1,11 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { Container, Button, Table, Form, Modal } from 'react-bootstrap'
 
+import { APIFETCHLOCATION } from './constants'
+
 type PantryItem = {
   name: string
   id: string
   nutrition: string | null
   thumbnail: string | null
+}
+
+type APIPantryItem = {
+  name: string
+  id: string
+  thumbnail: string | null
+  nutritional_facts: string | null
 }
 
 const renderItemDetailRow = (
@@ -137,17 +146,35 @@ const EditItem: React.FC<EditItemProps> = ({
 }
 
 export default function ItemDetails(): React.ReactElement {
-  const data: PantryItem[] = [
-    {
-      id: '1',
-      name: 'poptart',
-      nutrition: 'dummy url',
-      thumbnail: 'dummy url',
-    },
-    { id: '2', name: 'banana', nutrition: 'dummy url', thumbnail: 'dummy url' },
-  ]
+  const [pantryItemList, setPantryItemList] = useState<PantryItem[]>([])
   const [currentEditingItem, setCurrentEditingItem] = useState<PantryItem>()
   const [modalVisible, setModalVisible] = useState(false)
+
+  // see ./constants.tsx
+  let apiEndpointURL = ''
+  if (APIFETCHLOCATION === 'localhost')
+    apiEndpointURL = `http://localhost:8080/api/v1/products`
+  else apiEndpointURL = 'unknown'
+
+  useEffect(() => {
+    fetch(apiEndpointURL)
+      .then((response) => response.json())
+      .then((json) =>
+        setPantryItemList(() => {
+          const temp: PantryItem[] = []
+          json.products.forEach((product: APIPantryItem) => {
+            temp.push({
+              name: product.name,
+              id: product.id,
+              thumbnail: product.thumbnail,
+              nutrition: product.nutritional_facts,
+            })
+          })
+          return temp
+        })
+      )
+      .catch((error) => console.error(error))
+  }, [])
 
   return (
     <Container>
@@ -172,7 +199,7 @@ export default function ItemDetails(): React.ReactElement {
           </tr>
         </thead>
         <tbody>
-          {data.map((item) =>
+          {pantryItemList.map((item) =>
             renderItemDetailRow(item, setModalVisible, setCurrentEditingItem)
           )}
         </tbody>
