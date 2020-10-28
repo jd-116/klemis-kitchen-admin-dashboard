@@ -4,13 +4,8 @@
   "private": true,
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "yarn format"
     }
-  },
-  "lint-staged": {
-    "./src/*.{js,jsx,ts,tsx}": [
-      "eslint --fix -f unix \"src/**/*.{js,jsx,ts,tsx,json}\""
-    ]
   },
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -34,7 +29,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --max-warnings 0 -f unix \"src/**/*.{js,jsx,ts,tsx,json}\"",
-    "format": "eslint --fix -f unix \"src/**/*.{js,jsx,ts,tsx,json}\""
+    "format": "eslint --quiet --fix -f unix \"src/**/*.{js,jsx,ts,tsx,json}\""
   },
   "eslintConfig": {
     "extends": "react-app"

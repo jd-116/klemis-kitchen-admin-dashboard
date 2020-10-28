@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Navbar, Tabs, Tab, Container, Row, Col, Button } from 'react-bootstrap'
 
+import Announcements from './Announcements'
 import Home from './Home'
 import ItemDetails from './ItemDetails'
 import Members from './Members'
@@ -40,7 +41,7 @@ function App(): React.ReactElement {
             <ItemDetails />
           </Tab>
           <Tab eventKey='announcements' title='Announcements'>
-            4
+            <Announcements />
           </Tab>
         </Tabs>
       </Container>

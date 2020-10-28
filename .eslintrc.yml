@@ -90,6 +90,7 @@ overrides:
       - "*.tsx"
     rules:
       react/prop-types: off
+      react-hooks/exhaustive-deps: off
       camelcase: off
 
 # ESLint Project Settings
