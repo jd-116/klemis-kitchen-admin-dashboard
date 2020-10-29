@@ -8,7 +8,6 @@ import Members from './Members'
 
 import 'bootstrap/dist/css/bootstrap.css'
 
-=======
 function App(): React.ReactElement {
   const [key, setKey] = useState('home')
   const resetHome = () => setKey('home')
@@ -83,7 +82,6 @@ function App(): React.ReactElement {
                 onClick= {() => {logButtonManager()}} >
                 {loggedIn ? 'Log Out' : 'Login'}
               </Button>
-=======
             </Container>
           </Col>
         </Row>
@@ -115,8 +113,6 @@ function App(): React.ReactElement {
           </Jumbotron>
           )
         }
-
-=======
 
       </Container>
     </Container>
