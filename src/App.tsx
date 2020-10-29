@@ -1,5 +1,15 @@
 import React, { useState } from 'react'
-import { Navbar, Tabs, Tab, Container, Row, Col, Button, Jumbotron, Image, Modal } from 'react-bootstrap'
+import {
+  Navbar,
+  Tabs,
+  Tab,
+  Container,
+  Row,
+  Col,
+  Button,
+  Jumbotron,
+  Modal,
+} from 'react-bootstrap'
 
 import Announcements from './Announcements'
 import Home from './Home'
@@ -16,27 +26,33 @@ function App(): React.ReactElement {
   const userLoggingIn = () => setLoggedIn(true)
   const userLoggingOut = () => setLoggedIn(false)
 
-  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const summonLogoutModal= () => setLogoutModalVisible(true);
-  const closeLogoutModal = () => setLogoutModalVisible(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false)
+  const summonLogoutModal = () => setLogoutModalVisible(true)
+  const closeLogoutModal = () => setLogoutModalVisible(false)
 
   type AdminUser = {
-      firstName: string
-      lastName: string
-      username: string
+    firstName: string
+    lastName: string
+    username: string
   }
 
   type UserLoginStatusProps = {
-    user: AdminUser,
-    onConfirm: () => void,
+    user: AdminUser
+    onConfirm: () => void
     onCancel: () => void
   }
 
-  const sampleUser: AdminUser =
-    { firstName: 'Steve', lastName: 'Fazenbaker', username: 'sfazenbaker420'}
+  const sampleUser: AdminUser = {
+    firstName: 'Steve',
+    lastName: 'Fazenbaker',
+    username: 'sfazenbaker420',
+  }
 
-
-  const LogoutModal:  React.FC<UserLoginStatusProps> = ({ user, onConfirm, onCancel }) => {
+  const LogoutModal: React.FC<UserLoginStatusProps> = ({
+    user,
+    onConfirm,
+    onCancel,
+  }) => {
     return (
       <Modal.Dialog>
         <Modal.Header>
@@ -48,23 +64,39 @@ function App(): React.ReactElement {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button onClick={() => { closeLogoutModal(); userLoggingOut(); resetHome() }} variant='primary'>Yes</Button>
-          <Button onClick={() => { closeLogoutModal() }} variant='primary'>No</Button>
+          <Button
+            onClick={() => {
+              closeLogoutModal()
+              userLoggingOut()
+              resetHome()
+            }}
+            variant='primary'
+          >
+            Yes
+          </Button>
+          <Button
+            onClick={() => {
+              closeLogoutModal()
+            }}
+            variant='primary'
+          >
+            No
+          </Button>
         </Modal.Footer>
       </Modal.Dialog>
     )
   }
 
   const logButtonManager = () => {
-      loggedIn ? logoutManger() : loginManager()
+    loggedIn ? logoutManger() : loginManager()
   }
 
   const loginManager = () => {
-      userLoggingIn()
+    userLoggingIn()
   }
 
   const logoutManger = () => {
-      summonLogoutModal()
+    summonLogoutModal()
   }
 
   return (
@@ -78,14 +110,28 @@ function App(): React.ReactElement {
           </Col>
           <Col>
             <Container className='float-right'>
-              <Button variant='danger'
-                onClick= {() => {logButtonManager()}} >
+              <Button
+                variant='danger'
+                onClick={() => {
+                  logButtonManager()
+                }}
+              >
                 {loggedIn ? 'Log Out' : 'Login'}
               </Button>
             </Container>
           </Col>
         </Row>
-        {logoutModalVisible && <LogoutModal user={sampleUser} onConfirm={() => { setLogoutModalVisible(false) }} onCancel={() => { setLogoutModalVisible(false) }} />}
+        {logoutModalVisible && (
+          <LogoutModal
+            user={sampleUser}
+            onConfirm={() => {
+              setLogoutModalVisible(false)
+            }}
+            onCancel={() => {
+              setLogoutModalVisible(false)
+            }}
+          />
+        )}
 
         {loggedIn ? (
           <Tabs activeKey={key} onSelect={(k: any) => setKey(k)}>
@@ -102,18 +148,25 @@ function App(): React.ReactElement {
               4
             </Tab>
           </Tabs>
-          ) : (
+        ) : (
           <Jumbotron>
             <Row className='d-flex justify-content-around'>
-              <p>Welcome to the Klemis Kitchen Admin Dashboard.
-                 This dashboard contains the tools necessary to manage the Klemis inventory system.</p>
-              <p>Please do not try to access this dashboard if you are not a Klemis Kitchen staff member.</p>
-              <p>If you are one, you may login to access the dashboard through the login button at the top right.</p>
+              <p>
+                Welcome to the Klemis Kitchen Admin Dashboard. This dashboard
+                contains the tools necessary to manage the Klemis inventory
+                system.
+              </p>
+              <p>
+                Please do not try to access this dashboard if you are not a
+                Klemis Kitchen staff member.
+              </p>
+              <p>
+                If you are one, you may login to access the dashboard through
+                the login button at the top right.
+              </p>
             </Row>
           </Jumbotron>
-          )
-        }
-
+        )}
       </Container>
     </Container>
   )
