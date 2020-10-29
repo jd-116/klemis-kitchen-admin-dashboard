@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { Navbar, Tabs, Tab, Container, Row, Col, Button, Jumbotron, Image, Modal } from 'react-bootstrap'
 
+import Announcements from './Announcements'
 import Home from './Home'
-import Members from './Members'
 import ItemDetails from './ItemDetails'
+import Members from './Members'
 
 import 'bootstrap/dist/css/bootstrap.css'
 
-function App() {
-
+=======
+function App(): React.ReactElement {
   const [key, setKey] = useState('home')
   const resetHome = () => setKey('home')
 
@@ -82,10 +83,10 @@ function App() {
                 onClick= {() => {logButtonManager()}} >
                 {loggedIn ? 'Log Out' : 'Login'}
               </Button>
+=======
             </Container>
           </Col>
         </Row>
-
         {logoutModalVisible && <LogoutModal user={sampleUser} onConfirm={() => { setLogoutModalVisible(false) }} onCancel={() => { setLogoutModalVisible(false) }} />}
 
         {loggedIn ? (
@@ -114,6 +115,8 @@ function App() {
           </Jumbotron>
           )
         }
+
+=======
 
       </Container>
     </Container>
