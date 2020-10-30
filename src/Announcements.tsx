@@ -42,7 +42,11 @@ type AddAnnouncementProp = {
   show: boolean
 }
 
-const AddAnnouncement: React.FC<AddAnnouncementProp> = ({ onConfirm, onCancel, show }) => {
+const AddAnnouncement: React.FC<AddAnnouncementProp> = ({
+  onConfirm,
+  onCancel,
+  show,
+}) => {
   const [announcementTitle, setAnnouncementTitle] = useState('')
   const [announcementBody, setAnnouncementBody] = useState('')
 
@@ -65,7 +69,9 @@ const AddAnnouncement: React.FC<AddAnnouncementProp> = ({ onConfirm, onCancel, s
             <Form.Label>Announcement Title</Form.Label>
             <Form.Control
               as='input'
-              placeholder={announcementTitle === '' ? 'Title' : announcementTitle}
+              placeholder={
+                announcementTitle === '' ? 'Title' : announcementTitle
+              }
               onChange={(e) => setAnnouncementTitle(e.target.value)}
             />
           </Form.Group>
@@ -94,13 +100,12 @@ const AddAnnouncement: React.FC<AddAnnouncementProp> = ({ onConfirm, onCancel, s
             const timestamp = new Date().toISOString()
             const request = new Request(requestURL, {
               method: 'POST',
-              body:
-                JSON.stringify(`"id": "${announcementTitle}", 
+              body: JSON.stringify(`"id": "${announcementTitle}", 
               "title": "${announcementTitle}", 
               "body": ${announcementBody}, 
               "timestamp": ${timestamp}`),
               headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
               },
             })
             fetch(request)
@@ -138,9 +143,7 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
     const bodyChanged = bodyValue !== announcement?.body ?? 'unknown'
 
     if (bodyChanged && titleValue) {
-      setRequestBody(
-        `{"title": "${titleValue}", "body": "${bodyValue}"}`
-      )
+      setRequestBody(`{"title": "${titleValue}", "body": "${bodyValue}"}`)
     } else if (titleChanged) {
       setRequestBody(`{"title": "${titleValue}"}`)
     } else if (bodyChanged) {
@@ -164,7 +167,9 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
         }}
         closeButton
       >
-        <Modal.Title>Edit Announcement {announcement ? announcement.id : 'unknown'}</Modal.Title>
+        <Modal.Title>
+          Edit Announcement {announcement ? announcement.id : 'unknown'}
+        </Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -204,8 +209,8 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
               method: 'PATCH',
               body: JSON.stringify(requestBody),
               headers: {
-                'Content-Type': 'application/json'
-              }
+                'Content-Type': 'application/json',
+              },
             })
             fetch(request)
             onConfirm()
@@ -222,9 +227,17 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
 export default function Announcements(): React.ReactElement {
   const [announcementList, setAnnouncementList] = useState<Announcement[]>([])
 
-  const [addAnnouncementModalVisible, setAddAnnouncementModalVisible] = useState(false)
-  const [editAnnouncementModalVisible, setEditAnnouncementModalVisible] = useState(false)
-  const [currentEditingAnnouncement, setCurrentEditingAnnouncement] = useState<Announcement>()
+  const [
+    addAnnouncementModalVisible,
+    setAddAnnouncementModalVisible,
+  ] = useState(false)
+  const [
+    editAnnouncementModalVisible,
+    setEditAnnouncementModalVisible,
+  ] = useState(false)
+  const [currentEditingAnnouncement, setCurrentEditingAnnouncement] = useState<
+    Announcement
+  >()
 
   // see ./constants.tsx
   const apiEndpointURL = `${APIFETCHLOCATION}/api/v1/announcements`
@@ -240,7 +253,9 @@ export default function Announcements(): React.ReactElement {
     <Container>
       <Row className='d-flex justify-content-around'>
         <h3>Klemis Kitchen Announcements</h3>
-        <Button onClick={() => setAddAnnouncementModalVisible(true)}>+ Add</Button>
+        <Button onClick={() => setAddAnnouncementModalVisible(true)}>
+          + Add
+        </Button>
       </Row>
       <AddAnnouncement
         onConfirm={() => {
@@ -271,11 +286,13 @@ export default function Announcements(): React.ReactElement {
           </tr>
         </thead>
         <tbody>
-          {announcementList.map((announcement) => renderAnnouncementRow(
-            announcement,
-            setEditAnnouncementModalVisible,
-            setCurrentEditingAnnouncement
-          ))}
+          {announcementList.map((announcement) =>
+            renderAnnouncementRow(
+              announcement,
+              setEditAnnouncementModalVisible,
+              setCurrentEditingAnnouncement
+            )
+          )}
         </tbody>
       </Table>
     </Container>
