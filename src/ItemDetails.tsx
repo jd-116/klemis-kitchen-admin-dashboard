@@ -151,10 +151,7 @@ export default function ItemDetails(): React.ReactElement {
   const [modalVisible, setModalVisible] = useState(false)
 
   // see ./constants.tsx
-  let apiEndpointURL = ''
-  if (APIFETCHLOCATION === 'localhost')
-    apiEndpointURL = `http://localhost:8080/api/v1/products`
-  else apiEndpointURL = 'unknown'
+  const apiEndpointURL = `${APIFETCHLOCATION}/api/v1/products`
 
   useEffect(() => {
     fetch(apiEndpointURL)
