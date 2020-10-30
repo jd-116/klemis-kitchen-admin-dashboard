@@ -133,7 +133,6 @@ const EditItem: React.FC<EditItemProps> = ({
               method: 'PATCH',
               body: requestBody,
             })
-            console.log(requestBody)
             onConfirm()
           }}
           variant='primary'
