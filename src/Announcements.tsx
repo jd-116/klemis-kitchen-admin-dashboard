@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Container, Button } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
 
 import { APIFETCHLOCATION } from './constants'
 
@@ -14,10 +14,7 @@ export default function Announcements(): React.ReactElement {
   const [announcementList, setAnnouncementList] = useState<Announcement[]>([])
 
   // see ./constants.tsx
-  let apiEndpointURL = ''
-  if (APIFETCHLOCATION === 'localhost')
-    apiEndpointURL = `http://localhost:8080/api/v1/announcements`
-  else apiEndpointURL = 'unknown'
+  const apiEndpointURL = `${APIFETCHLOCATION}/api/v1/announcements`
 
   useEffect(() => {
     fetch(apiEndpointURL)
