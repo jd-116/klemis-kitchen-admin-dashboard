@@ -48,6 +48,7 @@ type EditItemProps = {
   onConfirm: () => void
   onCancel: () => void
   show: boolean
+  rerender: () => void
 }
 
 const EditItem: React.FC<EditItemProps> = ({
@@ -55,25 +56,26 @@ const EditItem: React.FC<EditItemProps> = ({
   onConfirm,
   onCancel,
   show,
+  rerender,
 }) => {
   const [nutritionalFactValue, setNutritionalFactValue] = useState('unknown')
+  const [nutritionalFactChanged, setNutritionalFactChanged] = useState(false)
   const [thumbnailValue, setThumbnailValue] = useState('unknown')
-  const requestURL = `placeholder/product-metadata/${item?.id}`
-  const [requestBody, setRequestBody] = useState('{}')
+  const [thumbnailChanged, setThumbnailChanged] = useState(false)
+
+  const requestURL = `${APIFETCHLOCATION}/product-metadata/${item?.id}`
+  const [requestBody, setRequestBody] = useState({})
 
   useEffect(() => {
-    const thumbnailChanged = thumbnailValue !== item?.nutrition ?? 'unknown'
-    const nutritionalFactChanged =
-      nutritionalFactValue !== item?.nutrition ?? 'unknown'
-
-    if (thumbnailChanged && nutritionalFactValue) {
-      setRequestBody(
-        `{"nutrition": "${nutritionalFactValue}", "thumbnail": "${thumbnailValue}"}`
-      )
+    if (thumbnailChanged && nutritionalFactChanged) {
+      setRequestBody({
+        nutrition: nutritionalFactValue,
+        thumbnail: thumbnailValue,
+      })
     } else if (nutritionalFactChanged) {
-      setRequestBody(`{"nutrition": "${nutritionalFactValue}"}`)
+      setRequestBody({ nutrition: nutritionalFactValue })
     } else if (thumbnailChanged) {
-      setRequestBody(`{"thumbnail": "${thumbnailValue}"}`)
+      setRequestBody({ thumbnail: thumbnailValue })
     }
   }, [nutritionalFactValue, thumbnailValue])
 
@@ -85,6 +87,8 @@ const EditItem: React.FC<EditItemProps> = ({
       onEntering={() => {
         setNutritionalFactValue(item?.nutrition ?? 'unknown')
         setThumbnailValue(item?.thumbnail ?? 'unknown')
+        setNutritionalFactChanged(false)
+        setThumbnailChanged(false)
       }}
     >
       <Modal.Header
@@ -103,7 +107,10 @@ const EditItem: React.FC<EditItemProps> = ({
             <Form.Control
               as='input'
               placeholder={nutritionalFactValue}
-              onChange={(e) => setNutritionalFactValue(e.target.value)}
+              onChange={(e) => {
+                setNutritionalFactChanged(true)
+                setNutritionalFactValue(e.target.value)
+              }}
             />
           </Form.Group>
 
@@ -112,7 +119,10 @@ const EditItem: React.FC<EditItemProps> = ({
             <Form.Control
               as='input'
               placeholder={thumbnailValue}
-              onChange={(e) => setThumbnailValue(e.target.value)}
+              onChange={(e) => {
+                setThumbnailChanged(true)
+                setThumbnailValue(e.target.value)
+              }}
             />
           </Form.Group>
         </Form>
@@ -131,8 +141,12 @@ const EditItem: React.FC<EditItemProps> = ({
           onClick={() => {
             const request = new Request(requestURL, {
               method: 'PATCH',
-              body: requestBody,
+              body: JSON.stringify(requestBody),
+              headers: {
+                'Content-Type': 'application/json',
+              },
             })
+            fetch(request).then(() => rerender())
             onConfirm()
           }}
           variant='primary'
@@ -153,6 +167,10 @@ export default function ItemDetails(): React.ReactElement {
   const apiEndpointURL = `${APIFETCHLOCATION}/products`
 
   useEffect(() => {
+    getItems()
+  }, [])
+
+  const getItems = () => {
     fetch(apiEndpointURL)
       .then((response) => response.json())
       .then((json) =>
@@ -170,7 +188,7 @@ export default function ItemDetails(): React.ReactElement {
         })
       )
       .catch((error) => console.error(error))
-  }, [])
+  }
 
   return (
     <Container>
@@ -183,6 +201,7 @@ export default function ItemDetails(): React.ReactElement {
           setModalVisible(false)
         }}
         show={modalVisible}
+        rerender={getItems}
       />
       <Table striped bordered hover>
         <thead>

@@ -40,12 +40,14 @@ type AddAnnouncementProp = {
   onConfirm: () => void
   onCancel: () => void
   show: boolean
+  rerender: () => void
 }
 
 const AddAnnouncement: React.FC<AddAnnouncementProp> = ({
   onConfirm,
   onCancel,
   show,
+  rerender,
 }) => {
   const [announcementTitle, setAnnouncementTitle] = useState('')
   const [announcementBody, setAnnouncementBody] = useState('')
@@ -53,7 +55,15 @@ const AddAnnouncement: React.FC<AddAnnouncementProp> = ({
   const requestURL = `${APIFETCHLOCATION}/announcements`
 
   return (
-    <Modal show={show} onHide={onCancel} centered>
+    <Modal
+      show={show}
+      onHide={onCancel}
+      centered
+      onEntering={() => {
+        setAnnouncementTitle('')
+        setAnnouncementBody('')
+      }}
+    >
       <Modal.Header
         onClick={() => {
           onCancel()
@@ -100,15 +110,17 @@ const AddAnnouncement: React.FC<AddAnnouncementProp> = ({
             const timestamp = new Date().toISOString()
             const request = new Request(requestURL, {
               method: 'POST',
-              body: JSON.stringify(`"id": "${announcementTitle}", 
-              "title": "${announcementTitle}", 
-              "body": ${announcementBody}, 
-              "timestamp": ${timestamp}`),
+              body: JSON.stringify({
+                id: announcementTitle,
+                title: announcementTitle,
+                body: announcementBody,
+                timestamp,
+              }),
               headers: {
                 'Content-Type': 'application/json',
               },
             })
-            fetch(request)
+            fetch(request).then(() => rerender())
             onConfirm()
           }}
           variant='primary'
@@ -125,6 +137,7 @@ type EditAnnouncementProps = {
   onConfirm: () => void
   onCancel: () => void
   show: boolean
+  rerender: () => void
 }
 
 const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
@@ -132,22 +145,23 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
   onConfirm,
   onCancel,
   show,
+  rerender,
 }) => {
   const [titleValue, setTitleValue] = useState('unknown')
   const [bodyValue, setBodyValue] = useState('unknown')
+  const [titleChanged, setTitleChanged] = useState(false)
+  const [bodyChanged, setBodyChanged] = useState(false)
+
   const requestURL = `${APIFETCHLOCATION}/announcements/${announcement?.id}`
-  const [requestBody, setRequestBody] = useState('{}')
+  const [requestBody, setRequestBody] = useState({})
 
   useEffect(() => {
-    const titleChanged = titleValue !== announcement?.title ?? 'unknown'
-    const bodyChanged = bodyValue !== announcement?.body ?? 'unknown'
-
-    if (bodyChanged && titleValue) {
-      setRequestBody(`{"title": "${titleValue}", "body": "${bodyValue}"}`)
+    if (bodyChanged && titleChanged) {
+      setRequestBody({ title: titleValue, body: bodyValue })
     } else if (titleChanged) {
-      setRequestBody(`{"title": "${titleValue}"}`)
+      setRequestBody({ title: titleValue })
     } else if (bodyChanged) {
-      setRequestBody(`{"body": "${bodyValue}"}`)
+      setRequestBody({ body: bodyValue })
     }
   }, [titleValue, bodyValue])
 
@@ -159,6 +173,8 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
       onEntering={() => {
         setTitleValue(announcement?.title ?? 'unknown')
         setBodyValue(announcement?.body ?? 'unknown')
+        setTitleChanged(false)
+        setBodyChanged(false)
       }}
     >
       <Modal.Header
@@ -179,7 +195,10 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
             <Form.Control
               as='input'
               placeholder={titleValue}
-              onChange={(e) => setTitleValue(e.target.value)}
+              onChange={(e) => {
+                setTitleChanged(true)
+                setTitleValue(e.target.value)
+              }}
             />
           </Form.Group>
 
@@ -188,7 +207,10 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
             <Form.Control
               as='input'
               placeholder={bodyValue}
-              onChange={(e) => setBodyValue(e.target.value)}
+              onChange={(e) => {
+                setBodyChanged(true)
+                setBodyValue(e.target.value)
+              }}
             />
           </Form.Group>
         </Form>
@@ -212,7 +234,7 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
                 'Content-Type': 'application/json',
               },
             })
-            fetch(request)
+            fetch(request).then(() => rerender())
             onConfirm()
           }}
           variant='primary'
@@ -243,11 +265,15 @@ export default function Announcements(): React.ReactElement {
   const apiEndpointURL = `${APIFETCHLOCATION}/announcements`
 
   useEffect(() => {
+    getAnnouncements()
+  }, [])
+
+  const getAnnouncements = () => {
     fetch(apiEndpointURL)
       .then((response) => response.json())
       .then((json) => setAnnouncementList(json.announcements))
       .catch((error) => console.error(error))
-  }, [])
+  }
 
   return (
     <Container>
@@ -265,6 +291,7 @@ export default function Announcements(): React.ReactElement {
           setAddAnnouncementModalVisible(false)
         }}
         show={addAnnouncementModalVisible}
+        rerender={getAnnouncements}
       />
       <EditAnnouncement
         announcement={currentEditingAnnouncement}
@@ -275,6 +302,7 @@ export default function Announcements(): React.ReactElement {
           setEditAnnouncementModalVisible(false)
         }}
         show={editAnnouncementModalVisible}
+        rerender={getAnnouncements}
       />
       <Table striped bordered hover size='sm'>
         <thead>
