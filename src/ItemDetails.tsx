@@ -23,7 +23,7 @@ const renderItemDetailRow = (
   setCurrentEditingItem: (arg: PantryItem) => void
 ) => {
   return (
-    <tr>
+    <tr key={data.id}>
       <td>{data.id}</td>
       <td>{data.name}</td>
       <td>{data.nutrition}</td>
