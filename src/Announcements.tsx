@@ -50,7 +50,7 @@ const AddAnnouncement: React.FC<AddAnnouncementProp> = ({
   const [announcementTitle, setAnnouncementTitle] = useState('')
   const [announcementBody, setAnnouncementBody] = useState('')
 
-  const requestURL = `${APIFETCHLOCATION}/api/v1/announcements`
+  const requestURL = `${APIFETCHLOCATION}/announcements`
 
   return (
     <Modal show={show} onHide={onCancel} centered>
@@ -135,7 +135,7 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
 }) => {
   const [titleValue, setTitleValue] = useState('unknown')
   const [bodyValue, setBodyValue] = useState('unknown')
-  const requestURL = `${APIFETCHLOCATION}/api/v1/announcements/${announcement?.id}`
+  const requestURL = `${APIFETCHLOCATION}/announcements/${announcement?.id}`
   const [requestBody, setRequestBody] = useState('{}')
 
   useEffect(() => {
@@ -240,7 +240,7 @@ export default function Announcements(): React.ReactElement {
   >()
 
   // see ./constants.tsx
-  const apiEndpointURL = `${APIFETCHLOCATION}/api/v1/announcements`
+  const apiEndpointURL = `${APIFETCHLOCATION}/announcements`
 
   useEffect(() => {
     fetch(apiEndpointURL)
