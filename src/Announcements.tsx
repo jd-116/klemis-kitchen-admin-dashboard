@@ -17,7 +17,6 @@ const renderAnnouncementRow = (
 ) => {
   return (
     <tr key={announcement.id}>
-      <td>{announcement.id}</td>
       <td>{announcement.title}</td>
       <td>{announcement.body}</td>
       <td>{announcement.timestamp}</td>
@@ -307,7 +306,6 @@ export default function Announcements(): React.ReactElement {
       <Table striped bordered hover size='sm'>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Title</th>
             <th>Body</th>
             <th>Timestamp</th>
