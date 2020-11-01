@@ -6,7 +6,7 @@ import { APIFETCHLOCATION } from './constants'
 type PantryItem = {
   name: string
   id: string
-  nutrition: string | null
+  nutritional_facts: string | null
   thumbnail: string | null
 }
 
@@ -26,7 +26,7 @@ const renderItemDetailRow = (
     <tr key={data.id}>
       <td>{data.id}</td>
       <td>{data.name}</td>
-      <td>{data.nutrition}</td>
+      <td>{data.nutritional_facts}</td>
       <td>{data.thumbnail}</td>
       <td>
         <Button
@@ -63,17 +63,17 @@ const EditItem: React.FC<EditItemProps> = ({
   const [thumbnailValue, setThumbnailValue] = useState('unknown')
   const [thumbnailChanged, setThumbnailChanged] = useState(false)
 
-  const requestURL = `${APIFETCHLOCATION}/product-metadata/${item?.id}`
+  const requestURL = `${APIFETCHLOCATION}/products/${item?.id}`
   const [requestBody, setRequestBody] = useState({})
 
   useEffect(() => {
     if (thumbnailChanged && nutritionalFactChanged) {
       setRequestBody({
-        nutrition: nutritionalFactValue,
+        nutritional_facts: nutritionalFactValue,
         thumbnail: thumbnailValue,
       })
     } else if (nutritionalFactChanged) {
-      setRequestBody({ nutrition: nutritionalFactValue })
+      setRequestBody({ nutritional_facts: nutritionalFactValue })
     } else if (thumbnailChanged) {
       setRequestBody({ thumbnail: thumbnailValue })
     }
@@ -85,7 +85,7 @@ const EditItem: React.FC<EditItemProps> = ({
       onHide={onCancel}
       centered
       onEntering={() => {
-        setNutritionalFactValue(item?.nutrition ?? 'unknown')
+        setNutritionalFactValue(item?.nutritional_facts ?? 'unknown')
         setThumbnailValue(item?.thumbnail ?? 'unknown')
         setNutritionalFactChanged(false)
         setThumbnailChanged(false)
@@ -181,7 +181,7 @@ export default function ItemDetails(): React.ReactElement {
               name: product.name,
               id: product.id,
               thumbnail: product.thumbnail,
-              nutrition: product.nutritional_facts,
+              nutritional_facts: product.nutritional_facts,
             })
           })
           return temp
