@@ -9,8 +9,6 @@ import {
   Button,
   Jumbotron,
   Modal,
-  Image,
-  Figure
 } from 'react-bootstrap'
 
 import Announcements from './Announcements'
@@ -56,7 +54,7 @@ function App(): React.ReactElement {
     onCancel,
   }) => {
     return (
-      <Modal show={logoutModalVisible} onHide={onCancel} centered>
+      <Modal.Dialog>
         <Modal.Header>
           <Modal.Title>Logged in as {user.username} </Modal.Title>
         </Modal.Header>
@@ -68,7 +66,9 @@ function App(): React.ReactElement {
         <Modal.Footer>
           <Button
             onClick={() => {
-              logoutManger()
+              closeLogoutModal()
+              userLoggingOut()
+              resetHome()
             }}
             variant='primary'
           >
@@ -83,12 +83,12 @@ function App(): React.ReactElement {
             No
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal.Dialog>
     )
   }
 
   const logButtonManager = () => {
-    loggedIn ? summonLogoutModal() : loginManager()
+    loggedIn ? logoutManger() : loginManager()
   }
 
   const loginManager = () => {
@@ -96,9 +96,7 @@ function App(): React.ReactElement {
   }
 
   const logoutManger = () => {
-    closeLogoutModal()
-    userLoggingOut()
-    resetHome()
+    summonLogoutModal()
   }
 
   return (
@@ -154,46 +152,23 @@ function App(): React.ReactElement {
             </Tab>
           </Tabs>
         ) : (
-          <Container>
-            <Jumbotron>
-              <Row className='d-flex justify-content-around'>
-                <p>
-                  Welcome to the Klemis Kitchen Admin Dashboard. This dashboard
-                  contains the tools necessary to manage the Klemis inventory
-                  system.
-                </p>
-                <p>
-                  Please do not try to access this dashboard if you are not a
-                  Klemis Kitchen staff member.
-                </p>
-                <p>
-                  If you are one, you may login to access the dashboard through
-                  the login button at the top right.
-                </p>
-              </Row>
-            </Jumbotron>
-            <h1>
-              About Klemis Kitchen
-            </h1>
-            <p>
-              Klemis Kitchen is the Georgia Tech campus's food pantry, and it functions with the goal that no Georgia Tech student should go hungry.
-            </p>
+          <Jumbotron>
             <Row className='d-flex justify-content-around'>
-              <Figure>
-                <Figure.Image
-                  width={684}
-                  height={720}
-                  alt="171x180"
-                  src="https://scontent-lga3-1.xx.fbcdn.net/v/t31.0-8/10710410_364416363723947_4010932865751888_o.jpg?_nc_cat=101&ccb=2&_nc_sid=19026a&_nc_ohc=SdK1bbkdtagAX_C8VrX&_nc_ht=scontent-lga3-1.xx&oh=01327dc74d8b06050feb729bf36586de&oe=5FC158E9"
-                />
-                <Row className='d-flex justify-content-around'>
-                  <Figure.Caption>
-                    Klemis Kitchen representatives receiving the 2014 Georgia Tech SAA Gift to Tech
-                  </Figure.Caption>
-                </Row>
-              </Figure>
+              <p>
+                Welcome to the Klemis Kitchen Admin Dashboard. This dashboard
+                contains the tools necessary to manage the Klemis inventory
+                system.
+              </p>
+              <p>
+                Please do not try to access this dashboard if you are not a
+                Klemis Kitchen staff member.
+              </p>
+              <p>
+                If you are one, you may login to access the dashboard through
+                the login button at the top right.
+              </p>
             </Row>
-          </Container>
+          </Jumbotron>
         )}
       </Container>
     </Container>
