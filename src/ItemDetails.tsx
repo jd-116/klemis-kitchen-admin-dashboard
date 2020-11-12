@@ -60,11 +60,14 @@ const EditItem: React.FC<EditItemProps> = ({
 }) => {
   const [nutritionalFactValue, setNutritionalFactValue] = useState('unknown')
   const [nutritionalFactChanged, setNutritionalFactChanged] = useState(false)
+  const [nutritionalFactDisabled, setNutritionalFactDisabled] = useState(false)
   const [thumbnailValue, setThumbnailValue] = useState('unknown')
   const [thumbnailChanged, setThumbnailChanged] = useState(false)
+  const [thumbnailDisabled, setThumbnailDisabled] = useState(false)
 
   const requestURL = `${APIFETCHLOCATION}/products/${item?.id}`
   const [requestBody, setRequestBody] = useState({})
+  const s3URL = `${APIFETCHLOCATION}/upload`
 
   useEffect(() => {
     if (thumbnailChanged && nutritionalFactChanged) {
@@ -89,6 +92,8 @@ const EditItem: React.FC<EditItemProps> = ({
         setThumbnailValue(item?.thumbnail ?? 'unknown')
         setNutritionalFactChanged(false)
         setThumbnailChanged(false)
+        setThumbnailDisabled(false)
+        setNutritionalFactDisabled(false)
       }}
     >
       <Modal.Header
@@ -104,26 +109,75 @@ const EditItem: React.FC<EditItemProps> = ({
         <Form>
           <Form.Group controlId='NutritionalFactsURL'>
             <Form.Label>Edit Nutritional Information Label</Form.Label>
-            <Form.Control
-              as='input'
-              placeholder={nutritionalFactValue}
-              onChange={(e) => {
-                setNutritionalFactChanged(true)
-                setNutritionalFactValue(e.target.value)
-              }}
-            />
+            <>
+              <Form.Control
+                as='input'
+                placeholder={nutritionalFactValue}
+                onChange={(e) => {
+                  setNutritionalFactChanged(true)
+                  setNutritionalFactValue(e.target.value)
+                }}
+                disabled={nutritionalFactDisabled}
+              />
+              <Form.File
+                onChange={(e: any) => {
+                  const files: string[] = Array.from(e.target.files)
+                  const picture = new FormData()
+                  picture.append('file', files[0])
+                  const request = new Request(s3URL, {
+                    method: 'POST',
+                    body: picture,
+                    headers: {
+                      Accept: 'application/json',
+                      type: 'formData',
+                    },
+                  })
+                  fetch(request)
+                    .then((response) => response.json())
+                    .then((json) => {
+                      setNutritionalFactChanged(true)
+                      setNutritionalFactValue(json.url)
+                      setNutritionalFactDisabled(true)
+                    })
+                }}
+              />
+            </>
           </Form.Group>
 
           <Form.Group controlId='ThumbnailURL'>
             <Form.Label>Edit Item Thumbnail</Form.Label>
-            <Form.Control
-              as='input'
-              placeholder={thumbnailValue}
-              onChange={(e) => {
-                setThumbnailChanged(true)
-                setThumbnailValue(e.target.value)
-              }}
-            />
+            <>
+              <Form.Control
+                as='input'
+                placeholder={thumbnailValue}
+                onChange={(e) => {
+                  setThumbnailChanged(true)
+                  setThumbnailValue(e.target.value)
+                }}
+                disabled={thumbnailDisabled}
+              />
+              <Form.File
+                onChange={(e: any) => {
+                  const files: string[] = Array.from(e.target.files)
+                  const picture = new FormData()
+                  picture.append('file', files[0])
+                  const request = new Request(s3URL, {
+                    method: 'POST',
+                    body: picture,
+                    headers: {
+                      type: 'formData',
+                    },
+                  })
+                  fetch(request)
+                    .then((response) => response.json())
+                    .then((json) => {
+                      setThumbnailChanged(true)
+                      setThumbnailValue(json.url)
+                      setThumbnailDisabled(true)
+                    })
+                }}
+              />
+            </>
           </Form.Group>
         </Form>
       </Modal.Body>
