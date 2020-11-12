@@ -13,7 +13,8 @@ type Announcement = {
 const renderAnnouncementRow = (
   announcement: Announcement,
   setModalVisible: (arg: boolean) => void,
-  setCurrentEditingItem: (arg: Announcement) => void
+  setCurrentEditingItem: (arg: Announcement) => void,
+  setDeleteModalVisible: (arg: boolean) => void
 ) => {
   return (
     <tr key={announcement.id}>
@@ -29,6 +30,15 @@ const renderAnnouncementRow = (
           variant='primary'
         >
           Edit
+        </Button>
+        <Button
+          onClick={() => {
+            setCurrentEditingItem(announcement)
+            setDeleteModalVisible(true)
+          }}
+          variant='danger'
+        >
+          Delete
         </Button>
       </td>
     </tr>
@@ -183,7 +193,7 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
         closeButton
       >
         <Modal.Title>
-          Edit Announcement {announcement ? announcement.id : 'unknown'}
+          Edit Announcement {announcement ? announcement.title : 'unknown'}
         </Modal.Title>
       </Modal.Header>
 
@@ -245,6 +255,59 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
   )
 }
 
+type DeleteAnnouncementProps = {
+  announcement: Announcement | undefined
+  onConfirm: () => void
+  onCancel: () => void
+  show: boolean
+  rerender: () => void
+}
+
+const DeleteAnnouncement: React.FC<DeleteAnnouncementProps> = ({
+  announcement,
+  onConfirm,
+  onCancel,
+  show,
+  rerender,
+}) => {
+  const requestURL = `${APIFETCHLOCATION}/announcements/${announcement?.id}`
+
+  return (
+    <Modal show={show} onHide={onCancel} centered>
+      <Modal.Header
+        onClick={() => {
+          onCancel()
+        }}
+        closeButton
+      >
+        <Modal.Title>
+          Delete Announcement {announcement ? announcement.title : 'unknown'}?
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Footer>
+        <Button
+          onClick={() => {
+            onCancel()
+          }}
+          variant='secondary'
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            const request = new Request(requestURL, { method: 'DELETE' })
+            fetch(request).then(() => rerender())
+            onConfirm()
+          }}
+          variant='primary'
+        >
+          Confirm
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  )
+}
+
 export default function Announcements(): React.ReactElement {
   const [announcementList, setAnnouncementList] = useState<Announcement[]>([])
 
@@ -259,6 +322,7 @@ export default function Announcements(): React.ReactElement {
   const [currentEditingAnnouncement, setCurrentEditingAnnouncement] = useState<
     Announcement
   >()
+  const [deleteModalVisible, setDeleteEditModalVisible] = useState(false)
 
   // see ./constants.tsx
   const apiEndpointURL = `${APIFETCHLOCATION}/announcements`
@@ -303,6 +367,17 @@ export default function Announcements(): React.ReactElement {
         show={editAnnouncementModalVisible}
         rerender={getAnnouncements}
       />
+      <DeleteAnnouncement
+        announcement={currentEditingAnnouncement}
+        onConfirm={() => {
+          setDeleteEditModalVisible(false)
+        }}
+        onCancel={() => {
+          setDeleteEditModalVisible(false)
+        }}
+        show={deleteModalVisible}
+        rerender={getAnnouncements}
+      />
       <Table striped bordered hover size='sm'>
         <thead>
           <tr>
@@ -316,7 +391,8 @@ export default function Announcements(): React.ReactElement {
             renderAnnouncementRow(
               announcement,
               setEditAnnouncementModalVisible,
-              setCurrentEditingAnnouncement
+              setCurrentEditingAnnouncement,
+              setDeleteEditModalVisible
             )
           )}
         </tbody>
