@@ -92,6 +92,8 @@ const EditItem: React.FC<EditItemProps> = ({
         setThumbnailValue(item?.thumbnail ?? 'unknown')
         setNutritionalFactChanged(false)
         setThumbnailChanged(false)
+        setThumbnailDisabled(false)
+        setNutritionalFactDisabled(false)
       }}
     >
       <Modal.Header
@@ -130,12 +132,13 @@ const EditItem: React.FC<EditItemProps> = ({
                       type: 'formData',
                     },
                   })
-                  fetch(request).then((response) => {
-                    console.log(response)
-                    console.log(response.url)
-                    setNutritionalFactValue(response.url)
-                    setNutritionalFactDisabled(true)
-                  })
+                  fetch(request)
+                    .then((response) => response.json())
+                    .then((json) => {
+                      setNutritionalFactChanged(true)
+                      setNutritionalFactValue(json.url)
+                      setNutritionalFactDisabled(true)
+                    })
                 }}
               />
             </>
@@ -165,10 +168,13 @@ const EditItem: React.FC<EditItemProps> = ({
                       type: 'formData',
                     },
                   })
-                  fetch(request).then((response) => {
-                    setThumbnailValue(response.url)
-                    setThumbnailDisabled(true)
-                  })
+                  fetch(request)
+                    .then((response) => response.json())
+                    .then((json) => {
+                      setThumbnailChanged(true)
+                      setThumbnailValue(json.url)
+                      setThumbnailDisabled(true)
+                    })
                 }}
               />
             </>
