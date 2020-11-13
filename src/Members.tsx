@@ -5,36 +5,44 @@ import { APIFETCHLOCATION } from './constants'
 
 type Member = {
   username: string
-  permissions: boolean
+  admin_access: boolean
 }
 
 function getDefaultString(defaultPermission: boolean) {
-  console.log(defaultPermission)
   if (defaultPermission) {
-    return "Yes"
-  } else {
-    return "No"
+    return 'Yes'
   }
+  return 'No'
 }
 
 const renderMemberRow = (
   member: Member,
   setModalVisible: (arg: boolean) => void,
-  setCurrentEditingItem: (arg: Member) => void
+  setCurrentEditingMember: (arg: Member) => void, 
+  setDeleteModalVisible: (arg: boolean) => void
 ) => {
   return (
     <tr key={member.username}>
       <td>{member.username}</td>
-      <td>{getDefaultString(member.permissions)}</td>
+      <td>{getDefaultString(member.admin_access)}</td>
       <td>
         <Button
           onClick={() => {
-            setCurrentEditingItem(member)
+            setCurrentEditingMember(member)
             setModalVisible(true)
           }}
           variant='primary'
         >
           Edit
+        </Button>
+        <Button
+          onClick={() => {
+            setCurrentEditingMember(member)
+            setDeleteModalVisible(true)
+          }}
+          variant='danger'
+        >
+          Delete
         </Button>
       </td>
     </tr>
@@ -48,7 +56,12 @@ type AddMemberProp = {
   rerender: () => void
 }
 
-const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel, show, rerender, }) => {
+const AddMember: React.FC<AddMemberProp> = ({
+  onConfirm,
+  onCancel,
+  show,
+  rerender,
+}) => {
   const [memberUsername, setMemberUsername] = useState('')
   const [memberPermissions, setMemberPermissions] = useState(Boolean)
 
@@ -77,22 +90,19 @@ const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel, show, rerende
         <Form>
           <Form.Group controlId='GTUsername'>
             <Form.Label>GT Username</Form.Label>
-            <Form.Control 
-              as='input' 
-              placeholder={
-                memberUsername === '' ? 'Title' : memberUsername
-              }
+            <Form.Control
+              as='input'
+              placeholder={memberUsername === '' ? 'username' : memberUsername}
               onChange={(e) => setMemberUsername(e.target.value)}
-              />
+            />
           </Form.Group>
           <Form.Group controlId='Permissions'>
             <Form.Label>Permissions</Form.Label>
-            <Form.Control as='input' defaultValue='No' onChange={(e) => {
-              if (e.target.value == 'No') {
-                setMemberPermissions(false)}
-              else {
-                setMemberPermissions(true)
-              }}}>
+            <Form.Control
+              as='select'
+              defaultValue={String(memberPermissions)}
+              onChange={(e) => setMemberPermissions(Boolean(e.target.value))}
+            >
               <option>true</option>
               <option>false</option>
             </Form.Control>
@@ -101,6 +111,14 @@ const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel, show, rerende
       </Modal.Body>
 
       <Modal.Footer>
+        <Button
+          onClick={() => {
+            onCancel()
+          }}
+          variant='primary'
+        >
+          Cancel
+        </Button>
         <Button
           onClick={() => {
             const request = new Request(requestURL, {
@@ -118,21 +136,12 @@ const AddMember: React.FC<AddMemberProp> = ({ onConfirm, onCancel, show, rerende
           }}
           variant='secondary'
         >
-          Cancel
-        </Button>
-        <Button
-          onClick={() => {
-            onConfirm()
-          }}
-          variant='primary'
-        >
           Confirm
         </Button>
       </Modal.Footer>
     </Modal>
   )
 }
-
 
 type EditMemberProps = {
   member: Member | undefined
@@ -159,11 +168,12 @@ const EditAnnouncement: React.FC<EditMemberProps> = ({
 
   useEffect(() => {
     if (usernameChanged && permissionChanged) {
-      setRequestBody({ username: usernameValue, permission: permissionValue })
+      setRequestBody({ username: usernameValue, admin_access: permissionValue })
     } else if (usernameChanged) {
-      setRequestBody({ title: usernameValue })
+      setRequestBody({ username: usernameValue })
     } else if (permissionChanged) {
-      setRequestBody({ body: permissionValue })
+      console.log(true)
+      setRequestBody({ admin_access: permissionValue })
     }
   }, [usernameValue, permissionValue])
 
@@ -174,7 +184,7 @@ const EditAnnouncement: React.FC<EditMemberProps> = ({
       centered
       onEntering={() => {
         setUsernameValue(member?.username ?? 'unknown')
-        setPermissionValue(member?.permissions ?? false)
+        setPermissionValue(member?.admin_access ?? false)
         setUsernameChanged(false)
         setPermissionChanged(false)
       }}
@@ -186,38 +196,24 @@ const EditAnnouncement: React.FC<EditMemberProps> = ({
         closeButton
       >
         <Modal.Title>
-          Edit Announcement {member ? member.username : 'unknown'}
+          Edit Member {member ? member.username : 'unknown'}
         </Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
         <Form>
-          <Form.Group controlId='titlesURL'>
-            <Form.Label>Edit Announcement Title</Form.Label>
-            <Form.Control
-              as='input'
-              placeholder={usernameValue}
-              onChange={(e) => {
-                setUsernameChanged(true)
-                setUsernameValue(e.target.value)
-              }}
-            />
-          </Form.Group>
-
           <Form.Group controlId='bodyURL'>
-            <Form.Label>Edit Announcement body</Form.Label>
+            <Form.Label>Edit User Permissions</Form.Label>
             <Form.Control
-              as='input'
+              as='select'
               defaultValue={getDefaultString(permissionValue)}
               onChange={(e) => {
+                setPermissionValue(Boolean(e.target.value))
                 setPermissionChanged(true)
-                if (e.target.value == 'No') {
-                  setPermissionValue(false)}
-                else {
-                  setPermissionValue(true)
-                }}}>
-                  <option>No</option>
-                  <option>Yes</option>
+              }}
+            >
+              <option>No</option>
+              <option>Yes</option>
             </Form.Control>
           </Form.Group>
         </Form>
@@ -253,21 +249,66 @@ const EditAnnouncement: React.FC<EditMemberProps> = ({
   )
 }
 
+type DeleteAnnouncementProps = {
+  member: Member | undefined
+  onConfirm: () => void
+  onCancel: () => void
+  show: boolean
+  rerender: () => void
+}
+
+const DeleteAnnouncement: React.FC<DeleteAnnouncementProps> = ({
+  member,
+  onConfirm,
+  onCancel,
+  show,
+  rerender,
+}) => {
+  const requestURL = `${APIFETCHLOCATION}/memberships/${member?.username}`
+
+  return (
+    <Modal show={show} onHide={onCancel} centered>
+      <Modal.Header
+        onClick={() => {
+          onCancel()
+        }}
+        closeButton
+      >
+        <Modal.Title>
+          Delete Member {member ? member.username : 'unknown'}?
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Footer>
+        <Button
+          onClick={() => {
+            onCancel()
+          }}
+          variant='secondary'
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={() => {
+            const request = new Request(requestURL, { method: 'DELETE' })
+            fetch(request).then(() => rerender())
+            onConfirm()
+          }}
+          variant='primary'
+        >
+          Confirm
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  )
+}
 
 export default function Members(): React.ReactElement {
   const [memberList, setMemberList] = useState<Member[]>([])
 
-  const [
-    addMemberModalVisible,
-    setAddMemberModalVisible,
-  ] = useState(false)
-  const [
-    editMemberModalVisible,
-    setEditMemberModalVisible,
-  ] = useState(false)
-  const [currentEditingMember, setCurrentEditingMember] = useState<
-    Member
-  >()
+  const [addMemberModalVisible, setAddMemberModalVisible] = useState(false)
+  const [editMemberModalVisible, setEditMemberModalVisible] = useState(false)
+  const [currentEditingMember, setCurrentEditingMember] = useState<Member>()
+  const [deleteModalVisible, setDeleteEditModalVisible] = useState(false)
 
   // see ./constants.tsx
   const apiEndpointURL = `${APIFETCHLOCATION}/memberships`
@@ -311,6 +352,19 @@ export default function Members(): React.ReactElement {
         show={editMemberModalVisible}
         rerender={getMembers}
       />
+
+      <DeleteAnnouncement
+        member={currentEditingMember}
+        onConfirm={() => {
+          setDeleteEditModalVisible(false)
+        }}
+        onCancel={() => {
+          setDeleteEditModalVisible(false)
+        }}
+        show={deleteModalVisible}
+        rerender={getMembers}
+      />
+
       <Table striped bordered hover size='sm'>
         <thead>
           <tr>
@@ -324,7 +378,8 @@ export default function Members(): React.ReactElement {
             renderMemberRow(
               member,
               setEditMemberModalVisible,
-              setCurrentEditingMember
+              setCurrentEditingMember,
+              setDeleteEditModalVisible
             )
           )}
         </tbody>
