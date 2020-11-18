@@ -20,7 +20,7 @@ const renderAnnouncementRow = (
     <tr key={announcement.id}>
       <td>{announcement.title}</td>
       <td>{announcement.body}</td>
-      <td>{announcement.timestamp}</td>
+      <td>{new Date(announcement.timestamp).toLocaleString()}</td>
       <td>
         <Button
           onClick={() => {
