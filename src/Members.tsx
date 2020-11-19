@@ -18,7 +18,7 @@ function getDefaultString(defaultPermission: boolean) {
 const renderMemberRow = (
   member: Member,
   setModalVisible: (arg: boolean) => void,
-  setCurrentEditingMember: (arg: Member) => void, 
+  setCurrentEditingMember: (arg: Member) => void,
   setDeleteModalVisible: (arg: boolean) => void
 ) => {
   return (
