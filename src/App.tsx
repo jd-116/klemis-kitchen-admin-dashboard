@@ -9,13 +9,13 @@ import {
   Button,
   Jumbotron,
   Modal,
-  Image,
   Figure,
 } from 'react-bootstrap'
 
 import Announcements from './Announcements'
 import Home from './Home'
 import ItemDetails from './ItemDetails'
+import Locations from './Locations'
 import Members from './Members'
 
 import 'bootstrap/dist/css/bootstrap.css'
@@ -146,6 +146,9 @@ function App(): React.ReactElement {
             <Tab eventKey='members' title='Members'>
               <Members />
             </Tab>
+            <Tab eventKey='locations' title='Locations'>
+              <Locations />
+            </Tab>
             <Tab eventKey='details' title='Item Details'>
               <ItemDetails />
             </Tab>
@@ -174,8 +177,8 @@ function App(): React.ReactElement {
             </Jumbotron>
             <h1>About Klemis Kitchen</h1>
             <p>
-              Klemis Kitchen is the Georgia Tech campus&poss food pantry, and it&poss
-              goal is to let no Georgia Tech student go hungry.
+              Klemis Kitchen is the Georgia Tech campus&poss food pantry, and
+              it&poss goal is to let no Georgia Tech student go hungry.
             </p>
             <Row className='d-flex justify-content-around'>
               <Figure>
