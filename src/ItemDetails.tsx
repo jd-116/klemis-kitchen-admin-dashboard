@@ -49,6 +49,7 @@ type EditItemProps = {
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
 const EditItem: React.FC<EditItemProps> = ({
@@ -57,6 +58,7 @@ const EditItem: React.FC<EditItemProps> = ({
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const [nutritionalFactValue, setNutritionalFactValue] = useState('unknown')
   const [nutritionalFactChanged, setNutritionalFactChanged] = useState(false)
@@ -130,6 +132,7 @@ const EditItem: React.FC<EditItemProps> = ({
                     headers: {
                       Accept: 'application/json',
                       type: 'formData',
+                      Authorization: `Bearer ${authToken}`,
                     },
                   })
                   fetch(request)
@@ -166,6 +169,7 @@ const EditItem: React.FC<EditItemProps> = ({
                     body: picture,
                     headers: {
                       type: 'formData',
+                      Authorization: `Bearer ${authToken}`,
                     },
                   })
                   fetch(request)
@@ -198,6 +202,7 @@ const EditItem: React.FC<EditItemProps> = ({
               body: JSON.stringify(requestBody),
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
               },
             })
             fetch(request).then(() => rerender())
@@ -212,7 +217,13 @@ const EditItem: React.FC<EditItemProps> = ({
   )
 }
 
-export default function ItemDetails(): React.ReactElement {
+type ItemDetailsProps = {
+  authToken: string
+}
+
+export default function ItemDetails({
+  authToken,
+}: ItemDetailsProps): React.ReactElement {
   const [pantryItemList, setPantryItemList] = useState<PantryItem[]>([])
   const [currentEditingItem, setCurrentEditingItem] = useState<PantryItem>()
   const [modalVisible, setModalVisible] = useState(false)
@@ -225,7 +236,11 @@ export default function ItemDetails(): React.ReactElement {
   }, [])
 
   const getItems = () => {
-    fetch(apiEndpointURL)
+    fetch(
+      new Request(apiEndpointURL, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      })
+    )
       .then((response) => response.json())
       .then((json) =>
         setPantryItemList(() => {
@@ -256,6 +271,7 @@ export default function ItemDetails(): React.ReactElement {
         }}
         show={modalVisible}
         rerender={getItems}
+        authToken={authToken}
       />
       <Table striped bordered hover>
         <thead>

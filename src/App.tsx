@@ -21,104 +21,112 @@ import Members from './Members'
 
 import 'bootstrap/dist/css/bootstrap.css'
 
+type UserLoginStatusProps = {
+  user: AdminUser | null
+  onConfirm: () => void
+  onCancel: () => void
+  show: boolean
+}
+
+type AdminUser = {
+  firstName: string
+  lastName: string
+  username: string
+  authToken: string
+}
+
+const LogoutModal: React.FC<UserLoginStatusProps> = ({
+  user,
+  onConfirm,
+  onCancel,
+  show,
+}) => {
+  return (
+    <Modal show={show} onHide={onCancel} centered>
+      <Modal.Header>
+        <Modal.Title>
+          Logged in as {user ? user.username : 'Unknown'}{' '}
+        </Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+        <p>Are you sure you would like to logout?</p>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button
+          onClick={() => {
+            onConfirm()
+          }}
+          variant='primary'
+        >
+          Yes
+        </Button>
+        <Button
+          onClick={() => {
+            onCancel()
+          }}
+          variant='primary'
+        >
+          No
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  )
+}
+
 function App(): React.ReactElement {
   const [key, setKey] = useState('home')
-  const resetHome = () => setKey('home')
 
   const [loggedIn, setLoggedIn] = useState(false)
-  const userLoggingIn = () => setLoggedIn(true)
-  const userLoggingOut = () => setLoggedIn(false)
-
   const [logoutModalVisible, setLogoutModalVisible] = useState(false)
-  const summonLogoutModal = () => setLogoutModalVisible(true)
-  const closeLogoutModal = () => setLogoutModalVisible(false)
 
-  type AdminUser = {
-    firstName: string
-    lastName: string
-    username: string
+  const lolNotRealUser: AdminUser = {
+    firstName: 'George',
+    lastName: 'Burdell',
+    username: 'gburdell3',
+    authToken: '',
   }
+  const [loggedInUser, setLoggedInUser] = useState<AdminUser>(lolNotRealUser)
 
-  type UserLoginStatusProps = {
-    user: AdminUser
-    onConfirm: () => void
-    onCancel: () => void
-  }
-
-  const sampleUser: AdminUser = {
-    firstName: 'Steve',
-    lastName: 'Fazenbaker',
-    username: 'sfazenbaker420',
-  }
+  const authURL = `${APIFETCHLOCATION}/auth/login?redirect_uri=${window.location.href}`
+  const sessionCheckURL = `${APIFETCHLOCATION}/auth/session`
 
   useEffect(() => {
     if (window.location.href.includes('?code=')) {
       const authcode = window.location.href.substring(
         window.location.href.indexOf('?code=') + 6
       )
-      console.log(authcode)
       const tokenURL = `${APIFETCHLOCATION}/auth/token-exchange`
       const request = new Request(tokenURL, {
         method: 'POST',
         body: `${authcode}`,
       })
-      fetch(request).then((response) => {
-        console.log(response)
-        // window.location.href = window.location.href.substring(0, window.location.href.indexOf('?code='))
-      })
+      fetch(request)
+        .then((response) => response.json())
+        .then((json) => {
+          const url: any = new URL(window.location.href)
+          url.searchParams.set('code', 'code')
+          window.history.pushState(
+            null,
+            '',
+            window.location.href.substring(
+              0,
+              window.location.href.indexOf('?code=')
+            )
+          )
+          localStorage.setItem('authorization', JSON.stringify(json))
+          setLoggedIn(true)
+          setLoggedInUser({
+            firstName: json.session.first_name,
+            lastName: json.session.last_name,
+            username: json.session.username,
+            authToken: json.session.token,
+          })
+        })
+        .catch((error) => console.error(error))
     }
   }, [])
-
-  const LogoutModal: React.FC<UserLoginStatusProps> = ({
-    user,
-    onConfirm,
-    onCancel,
-  }) => {
-    return (
-      <Modal show={logoutModalVisible} onHide={onCancel} centered>
-        <Modal.Header>
-          <Modal.Title>Logged in as {user.username} </Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>
-          <p>Are you sure you would like to logout?</p>
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button
-            onClick={() => {
-              logoutManager()
-            }}
-            variant='primary'
-          >
-            Yes
-          </Button>
-          <Button
-            onClick={() => {
-              closeLogoutModal()
-            }}
-            variant='primary'
-          >
-            No
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    )
-  }
-
-  const logButtonManager = () => {
-    loggedIn ? summonLogoutModal() : loginManager()
-  }
-
-  const loginManager = () => {
-    userLoggingIn()
-  }
-
-  const logoutManager = () => {
-    closeLogoutModal()
-    userLoggingOut()
-    resetHome()
-  }
 
   return (
     <Container className='App'>
@@ -134,8 +142,39 @@ function App(): React.ReactElement {
               <Button
                 variant='danger'
                 onClick={() => {
-                  const authURL = `${APIFETCHLOCATION}/auth/login?redirect_uri=${window.location.href}`
-                  window.open(authURL)
+                  if (!loggedIn) {
+                    if (localStorage.getItem('authorization')) {
+                      const request = new Request(sessionCheckURL, {
+                        method: 'POST',
+                        body: JSON.parse(
+                          localStorage.getItem('authorization') ?? ''
+                        ).token,
+                      })
+                      fetch(request)
+                        .then((response) => response.json())
+                        .then((json) => {
+                          if (json.permissions.admin_access) {
+                            const currUser: AdminUser = {
+                              firstName: JSON.parse(
+                                localStorage.getItem('authorization') ?? ''
+                              ).session.first_name,
+                              lastName: JSON.parse(
+                                localStorage.getItem('authorization') ?? ''
+                              ).session.last_name,
+                              username: JSON.parse(
+                                localStorage.getItem('authorization') ?? ''
+                              ).session.username,
+                              authToken: JSON.parse(
+                                localStorage.getItem('authorization') ?? ''
+                              ).session.token,
+                            }
+                            setLoggedInUser(currUser)
+                            setLoggedIn(true)
+                          }
+                        })
+                        .catch((error) => window.open(authURL))
+                    }
+                  } else setLogoutModalVisible(true)
                 }}
               >
                 {loggedIn ? 'Log Out' : 'Login'}
@@ -143,17 +182,15 @@ function App(): React.ReactElement {
             </Container>
           </Col>
         </Row>
-        {logoutModalVisible && (
-          <LogoutModal
-            user={sampleUser}
-            onConfirm={() => {
-              setLogoutModalVisible(false)
-            }}
-            onCancel={() => {
-              setLogoutModalVisible(false)
-            }}
-          />
-        )}
+        <LogoutModal
+          user={loggedInUser}
+          onConfirm={() => {
+            setLoggedIn(false)
+            setLoggedInUser(lolNotRealUser)
+          }}
+          onCancel={() => setLogoutModalVisible(false)}
+          show={logoutModalVisible}
+        />
 
         {loggedIn ? (
           <Tabs
@@ -164,13 +201,13 @@ function App(): React.ReactElement {
               <Home />
             </Tab>
             <Tab eventKey='members' title='Members'>
-              <Members />
+              <Members authToken={loggedInUser.authToken} />
             </Tab>
             <Tab eventKey='details' title='Item Details'>
-              <ItemDetails />
+              <ItemDetails authToken={loggedInUser.authToken} />
             </Tab>
             <Tab eventKey='announcements' title='Announcements'>
-              <Announcements />
+              <Announcements authToken={loggedInUser.authToken} />
             </Tab>
           </Tabs>
         ) : (
@@ -194,8 +231,8 @@ function App(): React.ReactElement {
             </Jumbotron>
             <h1>About Klemis Kitchen</h1>
             <p>
-              Klemis Kitchen is the Georgia Tech campus's food pantry, and its
-              goal is to let no Georgia Tech student go hungry.
+              Klemis Kitchen is the Georgia Tech campus&apos;s food pantry, and
+              its goal is to let no Georgia Tech student go hungry.
             </p>
             <Row className='d-flex justify-content-around'>
               <Figure>

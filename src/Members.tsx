@@ -54,6 +54,7 @@ type AddMemberProp = {
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
 const AddMember: React.FC<AddMemberProp> = ({
@@ -61,6 +62,7 @@ const AddMember: React.FC<AddMemberProp> = ({
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const [memberUsername, setMemberUsername] = useState('')
   const [memberPermissions, setMemberPermissions] = useState(Boolean)
@@ -129,6 +131,7 @@ const AddMember: React.FC<AddMemberProp> = ({
               }),
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
               },
             })
             fetch(request).then(() => rerender())
@@ -149,14 +152,16 @@ type EditMemberProps = {
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
-const EditAnnouncement: React.FC<EditMemberProps> = ({
+const EditMember: React.FC<EditMemberProps> = ({
   member,
   onConfirm,
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const [usernameValue, setUsernameValue] = useState('unknown')
   const [permissionValue, setPermissionValue] = useState(false)
@@ -235,6 +240,7 @@ const EditAnnouncement: React.FC<EditMemberProps> = ({
               body: JSON.stringify(requestBody),
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
               },
             })
             fetch(request).then(() => rerender())
@@ -249,20 +255,22 @@ const EditAnnouncement: React.FC<EditMemberProps> = ({
   )
 }
 
-type DeleteAnnouncementProps = {
+type DeleteMemberProps = {
   member: Member | undefined
   onConfirm: () => void
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
-const DeleteAnnouncement: React.FC<DeleteAnnouncementProps> = ({
+const DeleteMember: React.FC<DeleteMemberProps> = ({
   member,
   onConfirm,
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const requestURL = `${APIFETCHLOCATION}/memberships/${member?.username}`
 
@@ -289,7 +297,12 @@ const DeleteAnnouncement: React.FC<DeleteAnnouncementProps> = ({
         </Button>
         <Button
           onClick={() => {
-            const request = new Request(requestURL, { method: 'DELETE' })
+            const request = new Request(requestURL, {
+              method: 'DELETE',
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            })
             fetch(request).then(() => rerender())
             onConfirm()
           }}
@@ -302,7 +315,13 @@ const DeleteAnnouncement: React.FC<DeleteAnnouncementProps> = ({
   )
 }
 
-export default function Members(): React.ReactElement {
+type MembersProps = {
+  authToken: string
+}
+
+export default function Members({
+  authToken,
+}: MembersProps): React.ReactElement {
   const [memberList, setMemberList] = useState<Member[]>([])
 
   const [addMemberModalVisible, setAddMemberModalVisible] = useState(false)
@@ -318,7 +337,11 @@ export default function Members(): React.ReactElement {
   }, [])
 
   const getMembers = () => {
-    fetch(apiEndpointURL)
+    fetch(
+      new Request(apiEndpointURL, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      })
+    )
       .then((response) => response.json())
       .then((json) => setMemberList(json.memberships))
       .catch((error) => console.error(error))
@@ -339,9 +362,10 @@ export default function Members(): React.ReactElement {
         }}
         show={addMemberModalVisible}
         rerender={getMembers}
+        authToken={authToken}
       />
 
-      <EditAnnouncement
+      <EditMember
         member={currentEditingMember}
         onConfirm={() => {
           setEditMemberModalVisible(false)
@@ -351,9 +375,10 @@ export default function Members(): React.ReactElement {
         }}
         show={editMemberModalVisible}
         rerender={getMembers}
+        authToken={authToken}
       />
 
-      <DeleteAnnouncement
+      <DeleteMember
         member={currentEditingMember}
         onConfirm={() => {
           setDeleteEditModalVisible(false)
@@ -363,6 +388,7 @@ export default function Members(): React.ReactElement {
         }}
         show={deleteModalVisible}
         rerender={getMembers}
+        authToken={authToken}
       />
 
       <Table striped bordered hover size='sm'>
