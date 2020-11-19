@@ -173,8 +173,7 @@ function App(): React.ReactElement {
                           }
                         })
                         .catch((error) => window.open(authURL))
-                    }
-                    else window.open(authURL)
+                    } else window.open(authURL)
                   } else setLogoutModalVisible(true)
                 }}
               >
@@ -188,6 +187,7 @@ function App(): React.ReactElement {
           onConfirm={() => {
             setLoggedIn(false)
             setLoggedInUser(lolNotRealUser)
+            setLogoutModalVisible(false)
           }}
           onCancel={() => setLogoutModalVisible(false)}
           show={logoutModalVisible}
