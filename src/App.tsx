@@ -174,6 +174,7 @@ function App(): React.ReactElement {
                         })
                         .catch((error) => window.open(authURL))
                     }
+                    else window.open(authURL)
                   } else setLogoutModalVisible(true)
                 }}
               >
