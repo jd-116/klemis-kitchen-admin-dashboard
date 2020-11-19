@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Navbar,
   Tabs,
@@ -14,6 +14,7 @@ import {
 } from 'react-bootstrap'
 
 import Announcements from './Announcements'
+import { APIFETCHLOCATION } from './constants'
 import Home from './Home'
 import ItemDetails from './ItemDetails'
 import Members from './Members'
@@ -49,6 +50,24 @@ function App(): React.ReactElement {
     lastName: 'Fazenbaker',
     username: 'sfazenbaker420',
   }
+
+  useEffect(() => {
+    if (window.location.href.includes('?code=')) {
+      const authcode = window.location.href.substring(
+        window.location.href.indexOf('?code=') + 6
+      )
+      console.log(authcode)
+      const tokenURL = `${APIFETCHLOCATION}/auth/token-exchange`
+      const request = new Request(tokenURL, {
+        method: 'POST',
+        body: `${authcode}`,
+      })
+      fetch(request).then((response) => {
+        console.log(response)
+        // window.location.href = window.location.href.substring(0, window.location.href.indexOf('?code='))
+      })
+    }
+  }, [])
 
   const LogoutModal: React.FC<UserLoginStatusProps> = ({
     user,
@@ -115,7 +134,8 @@ function App(): React.ReactElement {
               <Button
                 variant='danger'
                 onClick={() => {
-                  logButtonManager()
+                  const authURL = `${APIFETCHLOCATION}/auth/login?redirect_uri=${window.location.href}`
+                  window.open(authURL)
                 }}
               >
                 {loggedIn ? 'Log Out' : 'Login'}
@@ -174,7 +194,7 @@ function App(): React.ReactElement {
             </Jumbotron>
             <h1>About Klemis Kitchen</h1>
             <p>
-              Klemis Kitchen is the Georgia Tech campus&poss food pantry, and it&poss
+              Klemis Kitchen is the Georgia Tech campus's food pantry, and its
               goal is to let no Georgia Tech student go hungry.
             </p>
             <Row className='d-flex justify-content-around'>
