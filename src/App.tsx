@@ -123,7 +123,8 @@ function App(): React.ReactElement {
             username: json.session.username,
             authToken: json.token,
           })
-          if (loggedInUser && loggedInUser.authToken !== undefined) setLoggedIn(true)
+          if (loggedInUser && loggedInUser.authToken !== undefined)
+            setLoggedIn(true)
           else setLoginErrorModalVisible(true)
         })
         .catch((error) => console.error(error))
@@ -264,8 +265,8 @@ function App(): React.ReactElement {
             </Jumbotron>
             <h1>About Klemis Kitchen</h1>
             <p>
-                Klemis Kitchen is the Georgia Tech campus&apos; food pantry, and its
-                goal is to let no Georgia Tech student go hungry.
+              Klemis Kitchen is the Georgia Tech campus&apos; food pantry, and
+              its goal is to let no Georgia Tech student go hungry.
             </p>
             <Row className='d-flex justify-content-around'>
               <Figure>
