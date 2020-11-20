@@ -50,6 +50,7 @@ type AddAnnouncementProp = {
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
 const AddAnnouncement: React.FC<AddAnnouncementProp> = ({
@@ -57,6 +58,7 @@ const AddAnnouncement: React.FC<AddAnnouncementProp> = ({
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const [announcementTitle, setAnnouncementTitle] = useState('')
   const [announcementBody, setAnnouncementBody] = useState('')
@@ -127,6 +129,7 @@ const AddAnnouncement: React.FC<AddAnnouncementProp> = ({
               }),
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
               },
             })
             fetch(request).then(() => rerender())
@@ -147,6 +150,7 @@ type EditAnnouncementProps = {
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
 const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
@@ -155,6 +159,7 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const [titleValue, setTitleValue] = useState('unknown')
   const [bodyValue, setBodyValue] = useState('unknown')
@@ -241,6 +246,7 @@ const EditAnnouncement: React.FC<EditAnnouncementProps> = ({
               body: JSON.stringify(requestBody),
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
               },
             })
             fetch(request).then(() => rerender())
@@ -261,6 +267,7 @@ type DeleteAnnouncementProps = {
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
 const DeleteAnnouncement: React.FC<DeleteAnnouncementProps> = ({
@@ -269,6 +276,7 @@ const DeleteAnnouncement: React.FC<DeleteAnnouncementProps> = ({
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const requestURL = `${APIFETCHLOCATION}/announcements/${announcement?.id}`
 
@@ -295,7 +303,12 @@ const DeleteAnnouncement: React.FC<DeleteAnnouncementProps> = ({
         </Button>
         <Button
           onClick={() => {
-            const request = new Request(requestURL, { method: 'DELETE' })
+            const request = new Request(requestURL, {
+              method: 'DELETE',
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            })
             fetch(request).then(() => rerender())
             onConfirm()
           }}
@@ -308,7 +321,13 @@ const DeleteAnnouncement: React.FC<DeleteAnnouncementProps> = ({
   )
 }
 
-export default function Announcements(): React.ReactElement {
+type AnnouncementProps = {
+  authToken: string
+}
+
+export default function Announcements({
+  authToken,
+}: AnnouncementProps): React.ReactElement {
   const [announcementList, setAnnouncementList] = useState<Announcement[]>([])
 
   const [
@@ -332,7 +351,11 @@ export default function Announcements(): React.ReactElement {
   }, [])
 
   const getAnnouncements = () => {
-    fetch(apiEndpointURL)
+    fetch(
+      new Request(apiEndpointURL, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      })
+    )
       .then((response) => response.json())
       .then((json) => setAnnouncementList(json.announcements))
       .catch((error) => console.error(error))
@@ -355,6 +378,7 @@ export default function Announcements(): React.ReactElement {
         }}
         show={addAnnouncementModalVisible}
         rerender={getAnnouncements}
+        authToken={authToken}
       />
       <EditAnnouncement
         announcement={currentEditingAnnouncement}
@@ -366,6 +390,7 @@ export default function Announcements(): React.ReactElement {
         }}
         show={editAnnouncementModalVisible}
         rerender={getAnnouncements}
+        authToken={authToken}
       />
       <DeleteAnnouncement
         announcement={currentEditingAnnouncement}
@@ -377,6 +402,7 @@ export default function Announcements(): React.ReactElement {
         }}
         show={deleteModalVisible}
         rerender={getAnnouncements}
+        authToken={authToken}
       />
       <Table striped bordered hover size='sm'>
         <thead>

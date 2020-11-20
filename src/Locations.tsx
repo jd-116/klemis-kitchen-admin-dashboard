@@ -55,6 +55,7 @@ type AddLocationProp = {
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
 const AddLocation: React.FC<AddLocationProp> = ({
@@ -62,6 +63,7 @@ const AddLocation: React.FC<AddLocationProp> = ({
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const gtLongitude = 0
   const gtLatitude = 0
@@ -179,6 +181,7 @@ const AddLocation: React.FC<AddLocationProp> = ({
               }),
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
               },
             })
             fetch(request).then(() => rerender())
@@ -199,6 +202,7 @@ type EditLocationProps = {
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
 const EditLocation: React.FC<EditLocationProps> = ({
@@ -207,6 +211,7 @@ const EditLocation: React.FC<EditLocationProps> = ({
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const gtLongitude = 0
   const gtLatitude = 0
@@ -345,6 +350,7 @@ const EditLocation: React.FC<EditLocationProps> = ({
               body: JSON.stringify(requestBody),
               headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
               },
             })
             fetch(request).then(() => rerender())
@@ -365,6 +371,7 @@ type DeleteLocationProps = {
   onCancel: () => void
   show: boolean
   rerender: () => void
+  authToken: string
 }
 
 const DeleteLocation: React.FC<DeleteLocationProps> = ({
@@ -373,6 +380,7 @@ const DeleteLocation: React.FC<DeleteLocationProps> = ({
   onCancel,
   show,
   rerender,
+  authToken,
 }) => {
   const requestURL = `${APIFETCHLOCATION}/locations/${location?.id}`
 
@@ -399,7 +407,12 @@ const DeleteLocation: React.FC<DeleteLocationProps> = ({
         </Button>
         <Button
           onClick={() => {
-            const request = new Request(requestURL, { method: 'DELETE' })
+            const request = new Request(requestURL, {
+              method: 'DELETE',
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            })
             fetch(request).then(() => rerender())
             onConfirm()
           }}
@@ -412,7 +425,13 @@ const DeleteLocation: React.FC<DeleteLocationProps> = ({
   )
 }
 
-export default function Locations(): React.ReactElement {
+type LocationsProps = {
+  authToken: string
+}
+
+export default function Locations({
+  authToken,
+}: LocationsProps): React.ReactElement {
   const [locationList, setLocationList] = useState<Location[]>([])
 
   const [addLocationModalVisible, setAddLocationModalVisible] = useState(false)
@@ -432,7 +451,11 @@ export default function Locations(): React.ReactElement {
   }, [])
 
   const getLocations = () => {
-    fetch(apiEndpointURL)
+    fetch(
+      new Request(apiEndpointURL, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      })
+    )
       .then((response) => response.json())
       .then((json) => setLocationList(json.locations))
       .catch((error) => console.error(error))
@@ -453,6 +476,7 @@ export default function Locations(): React.ReactElement {
         }}
         show={addLocationModalVisible}
         rerender={getLocations}
+        authToken={authToken}
       />
       <EditLocation
         location={currentEditingLocation}
@@ -464,6 +488,7 @@ export default function Locations(): React.ReactElement {
         }}
         show={editLocationModalVisible}
         rerender={getLocations}
+        authToken={authToken}
       />
       <DeleteLocation
         location={currentEditingLocation}
@@ -475,6 +500,7 @@ export default function Locations(): React.ReactElement {
         }}
         show={deleteModalVisible}
         rerender={getLocations}
+        authToken={authToken}
       />
       <Table striped bordered hover size='sm'>
         <thead>
