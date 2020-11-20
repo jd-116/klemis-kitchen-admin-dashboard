@@ -80,6 +80,7 @@ function App(): React.ReactElement {
 
   const [loggedIn, setLoggedIn] = useState(false)
   const [logoutModalVisible, setLogoutModalVisible] = useState(false)
+  const [loginErrorModalVisible, setLoginErrorModalVisible] = useState(false)
 
   const lolNotRealUser: AdminUser = {
     firstName: 'George',
@@ -116,13 +117,14 @@ function App(): React.ReactElement {
             )
           )
           localStorage.setItem('authorization', JSON.stringify(json))
-          setLoggedIn(true)
           setLoggedInUser({
             firstName: json.session.first_name,
             lastName: json.session.last_name,
             username: json.session.username,
-            authToken: json.session.token,
+            authToken: json.token,
           })
+          if (loggedInUser && loggedInUser.authToken !== undefined) setLoggedIn(true)
+          else setLoginErrorModalVisible(true)
         })
         .catch((error) => console.error(error))
     }
@@ -145,10 +147,14 @@ function App(): React.ReactElement {
                   if (!loggedIn) {
                     if (localStorage.getItem('authorization')) {
                       const request = new Request(sessionCheckURL, {
-                        method: 'POST',
-                        body: JSON.parse(
-                          localStorage.getItem('authorization') ?? ''
-                        ).token,
+                        method: 'GET',
+                        headers: {
+                          Authorization: `Bearer ${
+                            JSON.parse(
+                              localStorage.getItem('authorization') ?? ''
+                            ).token
+                          }`,
+                        },
                       })
                       fetch(request)
                         .then((response) => response.json())
@@ -166,15 +172,23 @@ function App(): React.ReactElement {
                               ).session.username,
                               authToken: JSON.parse(
                                 localStorage.getItem('authorization') ?? ''
-                              ).session.token,
+                              ).token,
                             }
                             setLoggedInUser(currUser)
-                            setLoggedIn(true)
+                            if (
+                              loggedInUser &&
+                              loggedInUser.authToken !== undefined
+                            )
+                              setLoggedIn(true)
+                            else setLoginErrorModalVisible(true)
                           }
                         })
-                        .catch((error) => window.open(authURL))
-                    } else window.open(authURL)
-                  } else setLogoutModalVisible(true)
+                        .catch((error) => window.open(authURL, '_self'))
+                    } else window.open(authURL, '_self')
+                  } else {
+                    localStorage.removeItem('authorization')
+                    setLogoutModalVisible(true)
+                  }
                 }}
               >
                 {loggedIn ? 'Log Out' : 'Login'}
@@ -182,6 +196,21 @@ function App(): React.ReactElement {
             </Container>
           </Col>
         </Row>
+        <Modal show={loginErrorModalVisible} centered>
+          <Modal.Header>
+            <Modal.Title>
+              Error Logging In. You may need to reload the page.
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Footer>
+            <Button
+              onClick={() => setLoginErrorModalVisible(false)}
+              variant='danger'
+            >
+              dismiss
+            </Button>
+          </Modal.Footer>
+        </Modal>
         <LogoutModal
           user={loggedInUser}
           onConfirm={() => {
@@ -235,8 +264,8 @@ function App(): React.ReactElement {
             </Jumbotron>
             <h1>About Klemis Kitchen</h1>
             <p>
-              Klemis Kitchen is the Georgia Tech campus&poss food pantry, and
-              it&poss goal is to let no Georgia Tech student go hungry.
+                Klemis Kitchen is the Georgia Tech campus&apos; food pantry, and its
+                goal is to let no Georgia Tech student go hungry.
             </p>
             <Row className='d-flex justify-content-around'>
               <Figure>
