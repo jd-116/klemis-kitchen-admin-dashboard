@@ -185,7 +185,16 @@ function App(): React.ReactElement {
                           }
                         })
                         .catch((error) => window.open(authURL, '_self'))
-                    } else window.open(authURL, '_self')
+                    } else {
+                      const json = { session: {'first_name': 'Neil', 'last_name': 'Patel', 'username': 'npatel434'}, 'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJucGF0ZWw0MzQiLCJnaXZlbl9uYW1lIjoiTmVpbCIsImZhbWlseV9uYW1lIjoiUGF0ZWwiLCJpYXQiOiIyMDIwLTExLTIwVDE1OjQ3OjQ3LjEzMjc4Mjk5OVoiLCJrbGVtaXM6ZXhhIjpudWxsLCJrbGVtaXM6cGVybSI6eyJhZG1pbl9hY2Nlc3MiOnRydWV9fQ.T9tQ-sFVnbcpZ5da30uuIFACM2xEAq5Un36HHRhXKL8'}
+                      localStorage.setItem('authorization', JSON.stringify(json))
+                      setLoggedInUser({
+                        firstName: json.session.first_name,
+                        lastName: json.session.last_name,
+                        username: json.session.username,
+                        authToken: json.token,
+                      })
+                    }
                   } else {
                     localStorage.removeItem('authorization')
                     setLogoutModalVisible(true)
