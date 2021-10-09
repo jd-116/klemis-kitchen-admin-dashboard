@@ -10,7 +10,7 @@ New Features: Home Screen, Members, Locations, Item Details, and Announcements p
 Known Bugs: The Item Details table extends past the normal window size, and when uploading images, if the upload is canceled, the picture is uploaded to S3 but then lost forever, taking up unnecessary space  
 
 ## 🚀 Usage
-The dashboard will soon be available at [dashboard.klemis-kitchen.com](dashboard.klemis-kitchen.com)
+The dashboard will soon be available at [admin.klemis-kitchen.com](admin.klemis-kitchen.com)
  for authorized users. Alternatively, this application can be run locally by cloning the project from GitHub, and installing both `node.js` and `yarn`. Then, by using the command line or an equivalent, use 
 ```
 yarn install
